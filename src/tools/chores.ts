@@ -187,44 +187,61 @@ The chore will appear on the Skylight display.`,
         .optional()
         .describe("Reward points for completing this chore"),
     },
-    async ({ summary, date, time, assignee, recurring, recurrencePattern, rewardPoints }) => {
+    async ({ summary, date, time, assignee, upForGrabs, recurring, recurrencePattern, rewardPoints }) => {
       try {
         const config = getConfig();
         const choreDate = date ? parseDate(date, config.timezone) : getTodayDate(config.timezone);
 
-        // Resolve assignee to category ID (required by the API)
-        if (!assignee) {
-          // Fetch and list available categories so the user knows what to pass
-          const { getCategories } = await import("../api/endpoints/categories.js");
-          const categories = await getCategories();
-          const names = categories.map((c) => c.attributes.label ?? c.id).join(", ");
+        // A chore is either assigned to a family member or placed in the shared
+        // "Up For Grabs" pool — never both.
+        if (upForGrabs && assignee) {
           return {
             content: [
               {
                 type: "text" as const,
-                text: `The Skylight API requires a category (family member) for every chore.\nPlease provide an assignee. Available: ${names || "none found — check your frame ID"}`,
+                text: `Provide either "assignee" or "upForGrabs: true", not both.`,
               },
             ],
             isError: true,
           };
         }
 
-        const category = await findCategoryByName(assignee);
-        if (!category) {
-          const { getCategories } = await import("../api/endpoints/categories.js");
-          const categories = await getCategories();
-          const names = categories.map((c) => c.attributes.label ?? c.id).join(", ");
-          return {
-            content: [
-              {
-                type: "text" as const,
-                text: `Could not find a family member named "${assignee}".\nAvailable categories: ${names || "none found"}`,
-              },
-            ],
-            isError: true,
-          };
+        // Resolve assignee to a category ID (required by the API unless upForGrabs).
+        let categoryId: string | undefined;
+        if (!upForGrabs) {
+          if (!assignee) {
+            // Fetch and list available categories so the user knows what to pass
+            const { getCategories } = await import("../api/endpoints/categories.js");
+            const categories = await getCategories();
+            const names = categories.map((c) => c.attributes.label ?? c.id).join(", ");
+            return {
+              content: [
+                {
+                  type: "text" as const,
+                  text: `The Skylight API requires a category (family member) for every chore, unless it is created Up For Grabs.\nProvide an assignee, or set upForGrabs: true. Available: ${names || "none found — check your frame ID"}`,
+                },
+              ],
+              isError: true,
+            };
+          }
+
+          const category = await findCategoryByName(assignee);
+          if (!category) {
+            const { getCategories } = await import("../api/endpoints/categories.js");
+            const categories = await getCategories();
+            const names = categories.map((c) => c.attributes.label ?? c.id).join(", ");
+            return {
+              content: [
+                {
+                  type: "text" as const,
+                  text: `Could not find a family member named "${assignee}".\nAvailable categories: ${names || "none found"}`,
+                },
+              ],
+              isError: true,
+            };
+          }
+          categoryId = category.id;
         }
-        const categoryId = category.id;
 
         // Convert simple recurrence patterns to RRULE
         let recurrenceSet: string | undefined;
