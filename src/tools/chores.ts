@@ -164,7 +164,15 @@ The chore will appear on the Skylight display.`,
         .describe("Due time (e.g., '10:00 AM', '14:30'). Optional."),
       assignee: z
         .string()
-        .describe("Family member to assign (e.g., 'Dad', 'Mom', 'Kids'). Required by the Skylight API."),
+        .optional()
+        .describe("Family member to assign (e.g., 'Dad', 'Mom', 'Kids'). Required unless upForGrabs is true."),
+      upForGrabs: z
+        .boolean()
+        .optional()
+        .default(false)
+        .describe(
+          "Create the chore in the shared 'Up For Grabs' pool — unassigned and claimable by any family member. When true, leave assignee empty."
+        ),
       recurring: z
         .boolean()
         .optional()
