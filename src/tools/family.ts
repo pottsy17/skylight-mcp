@@ -16,7 +16,10 @@ Shows who can be assigned chores and their profile details.
 Use this to answer:
 - "Who's in our family on Skylight?"
 - "What family members are set up?"
-- "Who can I assign chores to?"`,
+- "Who can I assign chores to?"
+
+Returns each member's category ID, usable as categoryIds in calendar
+event tools (or pass categoryNames there and skip the IDs entirely).`,
     {},
     async () => {
       try {
