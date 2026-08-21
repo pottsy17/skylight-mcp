@@ -75,7 +75,10 @@ export async function createChore(options: CreateChoreOptions): Promise<ChoreRes
     emoji_icon: options.emojiIcon ?? null,
   };
 
-  if (options.categoryId) {
+  if (options.upForGrabs) {
+    // "Up For Grabs" chores are unassigned: send the flag and omit any category.
+    body.up_for_grabs = true;
+  } else if (options.categoryId) {
     body.category_id = options.categoryId;
     body.category_ids = [options.categoryId];
   }
