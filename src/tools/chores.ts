@@ -278,6 +278,8 @@ The chore will appear on the Skylight display.`,
 
         if (assignee) {
           parts.push(`Assigned to: ${assignee}`);
+        } else if (upForGrabs) {
+          parts.push(`Assigned to: Up For Grabs (unassigned pool)`);
         }
 
         if (chore.attributes.recurring) {
