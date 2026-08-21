@@ -341,15 +341,12 @@ Parameters:
 
 Returns: The updated event details.
 
-<<<<<<< HEAD
 Notes:
 - Datetime values without a timezone designator are interpreted in the frame's
-  configured timezone. Pass an explicit offset to override.`,
-=======
-To move an event between source calendars, update both calendarId and
-calendarAccountId together (use get_source_calendars to discover valid
-IDs).`,
->>>>>>> feat/calendar-sync-source-from-pr23
+  configured timezone. Pass an explicit offset to override.
+- To move an event between source calendars, update both calendarId and
+  calendarAccountId together (use get_source_calendars to discover valid
+  IDs).`,
     {
       eventId: z.string().describe("ID of the event to update"),
       summary: z.string().optional().describe("New event title"),
