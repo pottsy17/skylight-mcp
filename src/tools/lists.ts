@@ -54,6 +54,73 @@ async function resolveListId(
   return { success: false, error: "Either listId or listName is required" };
 }
 
+/**
+ * Minimal structural shape for list-item label matching (kept loose so the
+ * matcher is unit-testable without the generated API types).
+ */
+export interface LabeledListItem {
+  id: string;
+  attributes: { label?: string | null };
+}
+
+/**
+ * Match items by label, case-insensitively. Exact matches win over partial
+ * matches so "milk" resolves cleanly even when "2% milk" is also on the list.
+ */
+export function matchItemsByLabel<T extends LabeledListItem>(items: T[], label: string): T[] {
+  const lower = label.toLowerCase();
+  const exact = items.filter((item) => item.attributes.label?.toLowerCase() === lower);
+  if (exact.length > 0) {
+    return exact;
+  }
+  return items.filter((item) => item.attributes.label?.toLowerCase().includes(lower));
+}
+
+/**
+ * Result of resolving a list item from itemId or itemLabel
+ */
+type ItemResolutionResult =
+  | { success: true; id: string; label: string }
+  | { success: false; error: string };
+
+/**
+ * Resolve a list item ID from either itemId or itemLabel (fetches the list's
+ * items and matches by label when only a label is given).
+ */
+async function resolveListItemId(
+  listId: string,
+  itemId?: string,
+  itemLabel?: string
+): Promise<ItemResolutionResult> {
+  if (itemId) {
+    return { success: true, id: itemId, label: itemLabel ?? itemId };
+  }
+
+  if (!itemLabel) {
+    return { success: false, error: "Either itemId or itemLabel is required" };
+  }
+
+  const { items } = await getListWithItems(listId);
+  const matches = matchItemsByLabel(items, itemLabel);
+
+  if (matches.length === 0) {
+    return {
+      success: false,
+      error: `No item matching "${itemLabel}" found on this list. Use get_list_items to see what's on it.`,
+    };
+  }
+
+  if (matches.length > 1) {
+    const options = matches.map((item) => `"${item.attributes.label}" (ID: ${item.id})`).join(", ");
+    return {
+      success: false,
+      error: `Multiple items match "${itemLabel}": ${options}. Use itemId to pick one.`,
+    };
+  }
+
+  return { success: true, id: matches[0].id, label: matches[0].attributes.label ?? itemLabel };
+}
+
 export function registerListTools(server: McpServer): void {
   // get_lists tool
   server.tool(
