@@ -621,22 +621,48 @@ Use this when:
 - Deleting an item instead of marking it complete
 
 Parameters:
-- itemId (required): ID of the item to delete
-- listId (required): ID of the list containing the item
+- itemId: ID of the item to delete (from get_list_items)
+- itemLabel: Text of the item to delete (alternative to itemId, e.g. "milk")
+- listId: ID of the list containing the item
+- listName: Name of the list (alternative to listId; defaults to the grocery list)
 
 Note: This permanently removes the item. Use update_list_item with status="completed" to check it off instead.`,
     {
-      itemId: z.string().describe("ID of the item to delete"),
-      listId: z.string().describe("ID of the list containing the item"),
+      itemId: z.string().optional().describe("ID of the item to delete"),
+      itemLabel: z
+        .string()
+        .optional()
+        .describe("Text of the item to delete (alternative to itemId, e.g. 'milk')"),
+      listId: z.string().optional().describe("ID of the list containing the item"),
+      listName: z
+        .string()
+        .optional()
+        .describe("Name of the list (alternative to listId; defaults to the grocery list)"),
     },
-    async ({ itemId, listId }) => {
+    async ({ itemId, itemLabel, listId, listName }) => {
       try {
-        await deleteListItem(listId, itemId);
+        const resolvedList = await resolveListId(listId, listName, true);
+        if (!resolvedList.success) {
+          return {
+            content: [{ type: "text" as const, text: resolvedList.error }],
+            isError: true,
+          };
+        }
+
+        const resolvedItem = await resolveListItemId(resolvedList.id, itemId, itemLabel);
+        if (!resolvedItem.success) {
+          return {
+            content: [{ type: "text" as const, text: resolvedItem.error }],
+            isError: true,
+          };
+        }
+
+        await deleteListItem(resolvedList.id, resolvedItem.id);
         return {
           content: [
             {
               type: "text" as const,
-              text: `Deleted item from list`,
+              text: `Deleted "${resolvedItem.label}" from ${resolvedList.name}`,
             },
           ],
         };
