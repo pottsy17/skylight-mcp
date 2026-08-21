@@ -5,9 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.1.0] - 2026-08-20
+
+First release as `@pottsy17/skylight-mcp` — a maintained continuation of `@rjhalvorson/skylight-mcp` (see README note). Everything below plus the previously-unreleased fixes from the upstream PR queue.
 
 ### Added
+
+- **"Up For Grabs" chore support** (upstream issue [#5](https://github.com/rjhalvorson/skylight-mcp/issues/5), implemented from the captured request in that issue — thanks to its author). `create_chore` accepts `upForGrabs: true` to create an unassigned chore any family member can claim; `assignee` is now optional (required unless `upForGrabs`). Verified live: the API stores and echoes `up_for_grabs: true` with no category. Known limitation, verified by probing: Up For Grabs chores are **not returned** by the chores read endpoint under any known parameter combination, so `get_chores` cannot show them — the create confirmation says so.
+
+### Fixed
+
+- **Successful DELETEs no longer report failure.** The Skylight API returns HTTP 200 with an empty body on deletes; the client unconditionally parsed JSON and threw `Unexpected end of JSON input` *after* the delete had succeeded — so every `delete_chore`/`delete_calendar_event`/`delete_list_item` call looked failed while actually working. The client now treats an empty response body as an empty result. (Found live-testing Up For Grabs.)
 
 - **IDs exposed and names accepted across calendar and list tools** (the "object identity" fix; addresses [#3](https://github.com/rjhalvorson/skylight-mcp/issues/3) and bug 1 of [#6](https://github.com/rjhalvorson/skylight-mcp/issues/6) via the hybrid approach). `get_family_members` now prints each member's category ID; `create_calendar_event`/`update_calendar_event` accept a `categoryNames` parameter resolved to IDs automatically. `get_lists` and `get_list_items` now print list and item IDs; `update_list_item`/`delete_list_item` accept `itemLabel` + `listName` as an alternative to `itemId` + `listId` (previously the only way to obtain an item ID was… nothing, making both write tools unreachable). Label matching is case-insensitive with exact matches preferred over partial; ambiguous matches return the candidates with their IDs.
 
