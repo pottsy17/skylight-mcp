@@ -205,7 +205,13 @@ export class SkylightClient {
       return {} as T;
     }
 
-    return response.json() as Promise<T>;
+    // Some endpoints (notably DELETE) return 200/204 with an empty body;
+    // response.json() would throw on those, making a successful call look failed.
+    const text = await response.text();
+    if (!text) {
+      return {} as T;
+    }
+    return JSON.parse(text) as T;
   }
 
   /**
