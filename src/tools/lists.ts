@@ -150,7 +150,7 @@ Returns list names, types (shopping/to_do), and item counts.`,
             const attrs = list.attributes;
             const itemCount = list.relationships?.list_items?.data?.length ?? 0;
             const parts = [
-              `- ${attrs.label}`,
+              `- ${attrs.label} (ID: ${list.id})`,
               `  Type: ${attrs.kind === "shopping" ? "Shopping list" : "To-do list"}`,
               `  Items: ${itemCount}`,
             ];
