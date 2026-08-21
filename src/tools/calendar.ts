@@ -264,6 +264,12 @@ Related: Use get_family_members to get category IDs for assignments.`,
       description: z.string().optional().describe("Additional notes for the event"),
       location: z.string().optional().describe("Event location"),
       categoryIds: z.array(z.string()).optional().describe("Family member IDs to assign"),
+      categoryNames: z
+        .array(z.string())
+        .optional()
+        .describe(
+          "Family member names to assign (e.g., ['Dad', 'Mom']). Resolved to IDs automatically; alternative to categoryIds."
+        ),
       calendarId: z
         .string()
         .optional()
