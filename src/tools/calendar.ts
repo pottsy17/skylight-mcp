@@ -9,8 +9,34 @@ import {
   deleteCalendarEvent,
 } from "../api/endpoints/calendar.js";
 import { getTodayDate, parseDate, formatDateForDisplay, normalizeDateTime } from "../utils/dates.js";
+import { resolveCategoryNames } from "../api/endpoints/categories.js";
 import { formatErrorForMcp } from "../utils/errors.js";
 import { getConfig } from "../config.js";
+
+/**
+ * Resolve categoryNames to IDs and merge with any explicitly passed
+ * categoryIds. Returns an error string when any name fails to resolve.
+ */
+async function mergeCategoryParams(
+  categoryIds: string[] | undefined,
+  categoryNames: string[] | undefined
+): Promise<{ ids: string[] | undefined; error?: string }> {
+  if (!categoryNames || categoryNames.length === 0) {
+    return { ids: categoryIds };
+  }
+
+  const resolution = await resolveCategoryNames(categoryNames);
+  if (resolution.unresolved.length > 0) {
+    return {
+      ids: undefined,
+      error:
+        `Could not find family member(s): ${resolution.unresolved.map((n) => `"${n}"`).join(", ")}.\n` +
+        `Available: ${resolution.available.join(", ") || "none found"}`,
+    };
+  }
+
+  return { ids: [...new Set([...(categoryIds ?? []), ...resolution.ids])] };
+}
 
 /**
  * Render a multi-line confirmation message for a created or updated event.
