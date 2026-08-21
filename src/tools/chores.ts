@@ -148,6 +148,7 @@ Returns chores with their assignees, due dates, and completion status.`,
 Use this when the user wants to:
 - Add a new task like "empty the dishwasher"
 - Assign chores to family members
+- Create an unassigned "Up For Grabs" chore (set upForGrabs: true)
 - Create recurring chores
 
 The chore will appear on the Skylight display.`,
