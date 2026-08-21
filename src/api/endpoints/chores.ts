@@ -53,6 +53,8 @@ export interface CreateChoreOptions {
   recurring?: boolean;
   recurrenceSet?: string;
   categoryId?: string;
+  /** When true, create the chore in the shared "Up For Grabs" pool (unassigned). */
+  upForGrabs?: boolean;
   rewardPoints?: number;
   emojiIcon?: string;
 }
