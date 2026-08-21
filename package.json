@@ -1,5 +1,5 @@
 {
-  "name": "@pottsy17/skylight-mcp",
+  "name": "@drpottsy/skylight-mcp",
   "version": "2.1.0",
   "description": "MCP server for Skylight Calendar API - enables agentic interactions for calendar, chores, lists, and family management. Maintained fork of @rjhalvorson/skylight-mcp.",
   "type": "module",

@@ -2,7 +2,7 @@
 
 An MCP (Model Context Protocol) server for the Skylight Calendar API. Enables AI assistants like Claude to interact with your Skylight family calendar, chores, lists, and more.
 
-> **Note:** This is a maintained continuation of [rjhalvorson/skylight-mcp](https://github.com/rjhalvorson/skylight-mcp), which was itself a continuation of [TheEagleByte/skylight-mcp](https://github.com/TheEagleByte/skylight-mcp). Each upstream went quiet; this repo carries the project forward with ongoing updates and bug fixes. The full commit history and authorship of both predecessors is preserved in git, with thanks to @rjhalvorson and @TheEagleByte for the foundation. Published on npm as `@pottsy17/skylight-mcp`.
+> **Note:** This is a maintained continuation of [rjhalvorson/skylight-mcp](https://github.com/rjhalvorson/skylight-mcp), which was itself a continuation of [TheEagleByte/skylight-mcp](https://github.com/TheEagleByte/skylight-mcp). Each upstream went quiet; this repo carries the project forward with ongoing updates and bug fixes. The full commit history and authorship of both predecessors is preserved in git, with thanks to @rjhalvorson and @TheEagleByte for the foundation. Published on npm as `@drpottsy/skylight-mcp`.
 
 ## Features
 
@@ -19,7 +19,7 @@ An MCP (Model Context Protocol) server for the Skylight Calendar API. Enables AI
 
 #### Option 1: Claude Desktop (.mcpb, easiest)
 
-1. Download the latest `skylight-mcp-<version>.mcpb` from the [Releases page](https://github.com/rjhalvorson/skylight-mcp/releases).
+1. Download the latest `skylight-mcp-<version>.mcpb` from the [Releases page](https://github.com/pottsy17/skylight-mcp/releases).
 2. In Claude Desktop, open **Settings → Extensions**, click **Advanced settings**, find the **Extension Developer** section, and click **Install Extension…**. Select the downloaded `.mcpb`. (On macOS/Windows, double-clicking the `.mcpb` file may also trigger the installer.)
 3. Fill in your Skylight email, password, frame ID, and timezone when prompted.
 4. That's it — the Skylight tools are available in Claude Desktop.
@@ -34,7 +34,7 @@ No Node.js install or config editing required. Credentials are stored securely b
   "mcpServers": {
     "skylight": {
       "command": "npx",
-      "args": ["@rjhalvorson/skylight-mcp"],
+      "args": ["@drpottsy/skylight-mcp"],
       "env": {
         "SKYLIGHT_EMAIL": "your_email@example.com",
         "SKYLIGHT_PASSWORD": "your_password",
@@ -47,7 +47,7 @@ No Node.js install or config editing required. Credentials are stored securely b
 
 **Claude Code:**
 ```bash
-claude mcp add skylight npx @rjhalvorson/skylight-mcp \
+claude mcp add skylight npx @drpottsy/skylight-mcp \
   -e SKYLIGHT_EMAIL=your_email@example.com \
   -e SKYLIGHT_PASSWORD=your_password \
   -e SKYLIGHT_FRAME_ID=your_frame_id
@@ -56,7 +56,7 @@ claude mcp add skylight npx @rjhalvorson/skylight-mcp \
 #### Option 3: From source
 
 ```bash
-git clone https://github.com/rjhalvorson/skylight-mcp.git
+git clone https://github.com/pottsy17/skylight-mcp.git
 cd skylight-mcp && npm install && npm run build
 ```
 
@@ -236,7 +236,7 @@ This MCP server is built on top of the reverse-engineered Skylight API. The API 
 - [API Reference (ReDoc)](https://theeaglebyte.github.io/skylight-api/redoc.html)
 - [OpenAPI Specification](https://theeaglebyte.github.io/skylight-api/openapi/openapi.yaml)
 
-If you discover new API endpoints or find issues with the API documentation itself, please contribute to the upstream [skylight-api](https://github.com/TheEagleByte/skylight-api) repository. For MCP server issues, use this repo's [issue tracker](https://github.com/rjhalvorson/skylight-mcp/issues).
+If you discover new API endpoints or find issues with the API documentation itself, please contribute to the upstream [skylight-api](https://github.com/TheEagleByte/skylight-api) repository. For MCP server issues, use this repo's [issue tracker](https://github.com/pottsy17/skylight-mcp/issues).
 
 ## Contributing
 
@@ -250,7 +250,7 @@ Contributions are welcome! Here's how you can help:
 ### Development Setup
 
 ```bash
-git clone https://github.com/rjhalvorson/skylight-mcp.git
+git clone https://github.com/pottsy17/skylight-mcp.git
 cd skylight-mcp
 npm install
 npm run dev  # Start with hot reload
@@ -290,14 +290,14 @@ When you install the `.mcpb` in Claude Desktop, you'll see a warning that the ex
 **Verifying the bundle you installed:**
 
 - All releases are published to npm with [OIDC-signed provenance](https://docs.npmjs.com/generating-provenance-statements), cryptographically linking each package to the GitHub Actions workflow run that built it.
-- Source code is fully open at [github.com/rjhalvorson/skylight-mcp](https://github.com/rjhalvorson/skylight-mcp); the server is under 3k lines of TypeScript and auditable.
+- Source code is fully open at [github.com/pottsy17/skylight-mcp](https://github.com/pottsy17/skylight-mcp); the server is under 3k lines of TypeScript and auditable.
 - Skylight's own privacy policy (how they handle the data you retrieve via this server) is at [skylightframe.com/privacy](https://www.skylightframe.com/privacy/).
 
 ## Issues & Support
 
-- **Bug reports**: [Open an issue](https://github.com/rjhalvorson/skylight-mcp/issues/new) with steps to reproduce
-- **Feature requests**: [Open an issue](https://github.com/rjhalvorson/skylight-mcp/issues/new) describing the use case
-- **Questions**: [Start a discussion](https://github.com/rjhalvorson/skylight-mcp/discussions) or open an issue
+- **Bug reports**: [Open an issue](https://github.com/pottsy17/skylight-mcp/issues/new) with steps to reproduce
+- **Feature requests**: [Open an issue](https://github.com/pottsy17/skylight-mcp/issues/new) describing the use case
+- **Questions**: [Start a discussion](https://github.com/pottsy17/skylight-mcp/discussions) or open an issue
 
 Please include relevant details like your Node.js version, error messages, and configuration (with sensitive values redacted).
 

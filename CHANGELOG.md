@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.1.0] - 2026-08-20
 
-First release as `@pottsy17/skylight-mcp` — a maintained continuation of `@rjhalvorson/skylight-mcp` (see README note). Everything below plus the previously-unreleased fixes from the upstream PR queue.
+First release as `@drpottsy/skylight-mcp` — a maintained continuation of `@rjhalvorson/skylight-mcp` (see README note). Everything below plus the previously-unreleased fixes from the upstream PR queue.
 
 ### Added
 
