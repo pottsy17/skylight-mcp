@@ -41,7 +41,7 @@ event tools (or pass categoryNames there and skip the IDs entirely).`,
 
           const categoryList = categories
             .map((cat) => {
-              const parts = [`- ${cat.attributes.label ?? "Unnamed"}`];
+              const parts = [`- ${cat.attributes.label ?? "Unnamed"} (ID: ${cat.id})`];
               if (cat.attributes.color) {
                 parts.push(`  Color: ${cat.attributes.color}`);
               }
