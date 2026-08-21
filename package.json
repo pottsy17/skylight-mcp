@@ -32,16 +32,20 @@
     "family",
     "chores"
   ],
-  "author": "rjhalvorson <rjhalvorson@gmail.com> (https://github.com/rjhalvorson)",
+  "author": "pottsy17 (https://github.com/pottsy17)",
+  "contributors": [
+    "rjhalvorson <rjhalvorson@gmail.com> (https://github.com/rjhalvorson) (original author)",
+    "avinashjoshi (https://github.com/avinashjoshi) (source-calendar sync)"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/rjhalvorson/skylight-mcp.git"
+    "url": "https://github.com/pottsy17/skylight-mcp.git"
   },
   "bugs": {
-    "url": "https://github.com/rjhalvorson/skylight-mcp/issues"
+    "url": "https://github.com/pottsy17/skylight-mcp/issues"
   },
-  "homepage": "https://github.com/rjhalvorson/skylight-mcp#readme",
+  "homepage": "https://github.com/pottsy17/skylight-mcp#readme",
   "publishConfig": {
     "access": "public"
   },
