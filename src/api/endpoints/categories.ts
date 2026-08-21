@@ -40,6 +40,41 @@ export async function findCategoryByName(name: string): Promise<CategoryResource
 }
 
 /**
+ * Result of resolving category names to IDs
+ */
+export interface CategoryNameResolution {
+  ids: string[];
+  unresolved: string[];
+  available: string[];
+}
+
+/**
+ * Resolve a list of category (family member) names to category IDs.
+ * Names that don't match are returned in `unresolved`; `available` lists
+ * all category labels so callers can build a helpful error message.
+ */
+export async function resolveCategoryNames(names: string[]): Promise<CategoryNameResolution> {
+  const ids: string[] = [];
+  const unresolved: string[] = [];
+
+  for (const name of names) {
+    const match = await findCategoryByName(name);
+    if (match) {
+      ids.push(match.id);
+    } else {
+      unresolved.push(name);
+    }
+  }
+
+  const categories = await getCategories();
+  return {
+    ids,
+    unresolved,
+    available: categories.map((c) => c.attributes.label ?? c.id),
+  };
+}
+
+/**
  * Get categories that are linked to profiles (actual family members)
  */
 export async function getFamilyMembers(): Promise<CategoryResource[]> {
