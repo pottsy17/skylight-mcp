@@ -235,6 +235,7 @@ Parameters:
 - description: Additional notes for the event
 - location: Where the event takes place
 - categoryIds: Family member IDs to associate with the event
+- categoryNames: Family member names (resolved to IDs automatically)
 
 Returns: The created event details.
 
