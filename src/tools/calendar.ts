@@ -402,6 +402,12 @@ Notes:
       description: z.string().optional().describe("Updated notes"),
       location: z.string().optional().describe("Updated location"),
       categoryIds: z.array(z.string()).optional().describe("Updated family member assignments"),
+      categoryNames: z
+        .array(z.string())
+        .optional()
+        .describe(
+          "Updated family member assignments by name (e.g., ['Dad', 'Mom']). Resolved to IDs automatically; alternative to categoryIds."
+        ),
       calendarId: z
         .string()
         .optional()
