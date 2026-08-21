@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **IDs exposed and names accepted across calendar and list tools** (the "object identity" fix; addresses [#3](https://github.com/rjhalvorson/skylight-mcp/issues/3) and bug 1 of [#6](https://github.com/rjhalvorson/skylight-mcp/issues/6) via the hybrid approach). `get_family_members` now prints each member's category ID; `create_calendar_event`/`update_calendar_event` accept a `categoryNames` parameter resolved to IDs automatically. `get_lists` and `get_list_items` now print list and item IDs; `update_list_item`/`delete_list_item` accept `itemLabel` + `listName` as an alternative to `itemId` + `listId` (previously the only way to obtain an item ID was… nothing, making both write tools unreachable). Label matching is case-insensitive with exact matches preferred over partial; ambiguous matches return the candidates with their IDs.
+
 ### Fixed
 
 - **Calendar datetime timezone handling.** `create_calendar_event` and `update_calendar_event` no longer treat naked ISO datetimes (e.g. `"2026-05-28T19:45:00"`) as UTC. When the input has no timezone designator, the configured frame timezone's offset is appended before sending to the Skylight API. Existing callers passing ISO strings with `Z` or explicit `±HH:MM` offsets are unaffected.
