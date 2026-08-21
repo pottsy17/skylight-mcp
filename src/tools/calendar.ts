@@ -216,6 +216,10 @@ Notes:
 - Datetime values without a timezone designator (e.g. "2026-05-28T19:45:00")
   are interpreted in the frame's configured timezone. Pass an explicit offset
   (e.g. "...T19:45:00-07:00") to override.
+- To sync events to a connected Google/iCloud calendar, pass both calendarId
+  and calendarAccountId. Use get_source_calendars to discover valid IDs.
+  Without these, events are stored on Skylight only and do not sync back to
+  the source calendar provider.
 
 Related: Use get_family_members to get category IDs for assignments.`,
     {
@@ -234,8 +238,53 @@ Related: Use get_family_members to get category IDs for assignments.`,
       description: z.string().optional().describe("Additional notes for the event"),
       location: z.string().optional().describe("Event location"),
       categoryIds: z.array(z.string()).optional().describe("Family member IDs to assign"),
+      calendarId: z
+        .string()
+        .optional()
+        .describe(
+          "Source calendar ID to sync the event to (e.g., a Google Calendar ID). Use get_source_calendars to discover. Required together with calendarAccountId for two-way sync."
+        ),
+      calendarAccountId: z
+        .string()
+        .optional()
+        .describe(
+          "Skylight calendar account ID associated with the source calendar. Use get_source_calendars to discover. Required together with calendarId for two-way sync."
+        ),
+      timezone: z
+        .string()
+        .optional()
+        .describe(
+          "Event timezone (e.g., 'America/Los_Angeles'). Defaults to the frame's configured timezone."
+        ),
+      rrule: z
+        .array(z.string())
+        .nullable()
+        .optional()
+        .describe("Recurrence rules in RRULE format (e.g., ['FREQ=WEEKLY;BYDAY=MO,WE,FR'])."),
+      countdownEnabled: z
+        .boolean()
+        .optional()
+        .describe("Show a countdown for this event on the frame."),
+      kind: z
+        .string()
+        .optional()
+        .describe("Event kind (e.g., 'standard', 'birthday'). Defaults to 'standard'."),
     },
-    async ({ summary, startsAt, endsAt, allDay, description, location, categoryIds }) => {
+    async ({
+      summary,
+      startsAt,
+      endsAt,
+      allDay,
+      description,
+      location,
+      categoryIds,
+      calendarId,
+      calendarAccountId,
+      timezone,
+      rrule,
+      countdownEnabled,
+      kind,
+    }) => {
       try {
         const config = getConfig();
         const event = await createCalendarEvent({
@@ -246,8 +295,12 @@ Related: Use get_family_members to get category IDs for assignments.`,
           description,
           location,
           category_ids: categoryIds,
-          timezone: config.timezone,
-          kind: "standard",
+          calendar_id: calendarId,
+          calendar_account_id: calendarAccountId,
+          timezone: timezone ?? config.timezone,
+          rrule,
+          countdown_enabled: countdownEnabled,
+          kind: kind ?? "standard",
         });
 
         return {
@@ -288,9 +341,15 @@ Parameters:
 
 Returns: The updated event details.
 
+<<<<<<< HEAD
 Notes:
 - Datetime values without a timezone designator are interpreted in the frame's
   configured timezone. Pass an explicit offset to override.`,
+=======
+To move an event between source calendars, update both calendarId and
+calendarAccountId together (use get_source_calendars to discover valid
+IDs).`,
+>>>>>>> feat/calendar-sync-source-from-pr23
     {
       eventId: z.string().describe("ID of the event to update"),
       summary: z.string().optional().describe("New event title"),
@@ -306,8 +365,46 @@ Notes:
       description: z.string().optional().describe("Updated notes"),
       location: z.string().optional().describe("Updated location"),
       categoryIds: z.array(z.string()).optional().describe("Updated family member assignments"),
+      calendarId: z
+        .string()
+        .optional()
+        .describe(
+          "Source calendar ID to associate the event with (from get_source_calendars). Pair with calendarAccountId."
+        ),
+      calendarAccountId: z
+        .string()
+        .optional()
+        .describe(
+          "Skylight calendar account ID associated with the source calendar (from get_source_calendars). Pair with calendarId."
+        ),
+      timezone: z.string().optional().describe("Updated event timezone (e.g., 'America/Los_Angeles')."),
+      rrule: z
+        .array(z.string())
+        .nullable()
+        .optional()
+        .describe("Updated recurrence rules in RRULE format (or null to clear)."),
+      countdownEnabled: z
+        .boolean()
+        .optional()
+        .describe("Toggle the countdown display for this event."),
+      kind: z.string().optional().describe("Updated event kind (e.g., 'standard', 'birthday')."),
     },
-    async ({ eventId, summary, startsAt, endsAt, allDay, description, location, categoryIds }) => {
+    async ({
+      eventId,
+      summary,
+      startsAt,
+      endsAt,
+      allDay,
+      description,
+      location,
+      categoryIds,
+      calendarId,
+      calendarAccountId,
+      timezone,
+      rrule,
+      countdownEnabled,
+      kind,
+    }) => {
       try {
         const config = getConfig();
         const updates: Record<string, unknown> = {};
@@ -318,6 +415,12 @@ Notes:
         if (description !== undefined) updates.description = description;
         if (location !== undefined) updates.location = location;
         if (categoryIds !== undefined) updates.category_ids = categoryIds;
+        if (calendarId !== undefined) updates.calendar_id = calendarId;
+        if (calendarAccountId !== undefined) updates.calendar_account_id = calendarAccountId;
+        if (timezone !== undefined) updates.timezone = timezone;
+        if (rrule !== undefined) updates.rrule = rrule;
+        if (countdownEnabled !== undefined) updates.countdown_enabled = countdownEnabled;
+        if (kind !== undefined) updates.kind = kind;
 
         const event = await updateCalendarEvent(eventId, updates);
 
