@@ -441,6 +441,7 @@ Notes:
       description,
       location,
       categoryIds,
+      categoryNames,
       calendarId,
       calendarAccountId,
       timezone,
@@ -450,6 +451,13 @@ Notes:
     }) => {
       try {
         const config = getConfig();
+        const categories = await mergeCategoryParams(categoryIds, categoryNames);
+        if (categories.error) {
+          return {
+            content: [{ type: "text" as const, text: categories.error }],
+            isError: true,
+          };
+        }
         const updates: Record<string, unknown> = {};
         if (summary !== undefined) updates.summary = summary;
         if (startsAt !== undefined) updates.starts_at = normalizeDateTime(startsAt, config.timezone);
@@ -457,7 +465,7 @@ Notes:
         if (allDay !== undefined) updates.all_day = allDay;
         if (description !== undefined) updates.description = description;
         if (location !== undefined) updates.location = location;
-        if (categoryIds !== undefined) updates.category_ids = categoryIds;
+        if (categories.ids !== undefined) updates.category_ids = categories.ids;
         if (calendarId !== undefined) updates.calendar_id = calendarId;
         if (calendarAccountId !== undefined) updates.calendar_account_id = calendarAccountId;
         if (timezone !== undefined) updates.timezone = timezone;
