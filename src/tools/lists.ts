@@ -294,13 +294,13 @@ Returns items organized by section with their completion status.`,
         }
 
         // Format output
-        const output: string[] = [`${result.list.attributes.label}:`];
+        const output: string[] = [`${result.list.attributes.label} (list ID: ${result.list.id}):`];
 
         // Items without sections first
         if (noSection.length > 0) {
           for (const item of noSection) {
             const status = item.attributes.status === "completed" ? "[x]" : "[ ]";
-            output.push(`${status} ${item.attributes.label}`);
+            output.push(`${status} ${item.attributes.label} (ID: ${item.id})`);
           }
         }
 
@@ -309,7 +309,7 @@ Returns items organized by section with their completion status.`,
           output.push(`\n${sectionName}:`);
           for (const item of sectionItems) {
             const status = item.attributes.status === "completed" ? "[x]" : "[ ]";
-            output.push(`${status} ${item.attributes.label}`);
+            output.push(`${status} ${item.attributes.label} (ID: ${item.id})`);
           }
         }
 
