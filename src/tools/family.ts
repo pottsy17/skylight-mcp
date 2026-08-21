@@ -65,7 +65,7 @@ event tools (or pass categoryNames there and skip the IDs entirely).`,
         const memberList = members
           .map((member) => {
             const attrs = member.attributes;
-            const parts = [`- ${attrs.label ?? "Unnamed"}`];
+            const parts = [`- ${attrs.label ?? "Unnamed"} (ID: ${member.id})`];
 
             if (attrs.color) {
               parts.push(`  Color: ${attrs.color}`);
