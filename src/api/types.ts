@@ -41,6 +41,7 @@ export interface ChoreAttributes {
   recurring: boolean;
   recurring_until: string | null;
   recurrence_set: string | null;
+  up_for_grabs?: boolean | null;
   reward_points: number | null;
   emoji_icon: string | null;
   routine: boolean | null;
