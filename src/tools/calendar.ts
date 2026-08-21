@@ -310,6 +310,7 @@ Related: Use get_family_members to get category IDs for assignments.`,
       description,
       location,
       categoryIds,
+      categoryNames,
       calendarId,
       calendarAccountId,
       timezone,
@@ -319,6 +320,13 @@ Related: Use get_family_members to get category IDs for assignments.`,
     }) => {
       try {
         const config = getConfig();
+        const categories = await mergeCategoryParams(categoryIds, categoryNames);
+        if (categories.error) {
+          return {
+            content: [{ type: "text" as const, text: categories.error }],
+            isError: true,
+          };
+        }
         const event = await createCalendarEvent({
           summary,
           starts_at: normalizeDateTime(startsAt, config.timezone),
@@ -326,7 +334,7 @@ Related: Use get_family_members to get category IDs for assignments.`,
           all_day: allDay,
           description,
           location,
-          category_ids: categoryIds,
+          category_ids: categories.ids,
           calendar_id: calendarId,
           calendar_account_id: calendarAccountId,
           timezone: timezone ?? config.timezone,
