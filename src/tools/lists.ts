@@ -545,28 +545,54 @@ Use this when:
 - Moving an item to a different section
 
 Parameters:
-- itemId (required): ID of the item to update
-- listId (required): ID of the list containing the item
+- itemId: ID of the item to update (from get_list_items)
+- itemLabel: Text of the item to update (alternative to itemId, e.g. "milk")
+- listId: ID of the list containing the item
+- listName: Name of the list (alternative to listId; defaults to the grocery list)
 - label: New text for the item
 - status: "completed" to check off, "pending" to uncheck
 - section: Move to a different section
 
 Returns: The updated item details.`,
     {
-      itemId: z.string().describe("ID of the item to update"),
-      listId: z.string().describe("ID of the list containing the item"),
+      itemId: z.string().optional().describe("ID of the item to update"),
+      itemLabel: z
+        .string()
+        .optional()
+        .describe("Text of the item to update (alternative to itemId, e.g. 'milk')"),
+      listId: z.string().optional().describe("ID of the list containing the item"),
+      listName: z
+        .string()
+        .optional()
+        .describe("Name of the list (alternative to listId; defaults to the grocery list)"),
       label: z.string().optional().describe("New text for the item"),
       status: z.enum(["pending", "completed"]).optional().describe("'completed' to check off, 'pending' to uncheck"),
       section: z.string().nullable().optional().describe("Move to a different section (null to remove from section)"),
     },
-    async ({ itemId, listId, label, status, section }) => {
+    async ({ itemId, itemLabel, listId, listName, label, status, section }) => {
       try {
+        const resolvedList = await resolveListId(listId, listName, true);
+        if (!resolvedList.success) {
+          return {
+            content: [{ type: "text" as const, text: resolvedList.error }],
+            isError: true,
+          };
+        }
+
+        const resolvedItem = await resolveListItemId(resolvedList.id, itemId, itemLabel);
+        if (!resolvedItem.success) {
+          return {
+            content: [{ type: "text" as const, text: resolvedItem.error }],
+            isError: true,
+          };
+        }
+
         const updates: { label?: string; status?: "pending" | "completed"; section?: string | null } = {};
         if (label !== undefined) updates.label = label;
         if (status !== undefined) updates.status = status;
         if (section !== undefined) updates.section = section;
 
-        const item = await updateListItem(listId, itemId, updates);
+        const item = await updateListItem(resolvedList.id, resolvedItem.id, updates);
         const statusText = status === "completed" ? " (marked complete)" : status === "pending" ? " (marked pending)" : "";
         return {
           content: [
