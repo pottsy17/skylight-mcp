@@ -379,6 +379,7 @@ Parameters:
 - description: Updated notes
 - location: Updated location
 - categoryIds: Updated family member assignments
+- categoryNames: Updated family member assignments by name
 
 Returns: The updated event details.
 
