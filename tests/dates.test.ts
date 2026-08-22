@@ -197,5 +197,31 @@ describe("dates", () => {
     it("handles empty string", () => {
       expect(normalizeDateTime("", "America/Los_Angeles")).toBe("");
     });
+
+    // Regression: single-pass offset detection treated the wall-clock string
+    // as a UTC instant, so LA times from 02:00–09:59 on spring-forward day
+    // got -08:00 despite daylight time being in effect.
+    it("assigns the post-transition offset on the morning of spring-forward day", () => {
+      // US spring forward 2026: March 8, 02:00 local. 03:30 exists and is PDT.
+      expect(normalizeDateTime("2026-03-08T03:30:00", "America/Los_Angeles")).toBe(
+        "2026-03-08T03:30:00-07:00"
+      );
+      expect(normalizeDateTime("2026-03-08T09:59:00", "America/Los_Angeles")).toBe(
+        "2026-03-08T09:59:00-07:00"
+      );
+    });
+
+    it("keeps the pre-transition offset just before spring-forward", () => {
+      expect(normalizeDateTime("2026-03-08T01:30:00", "America/Los_Angeles")).toBe(
+        "2026-03-08T01:30:00-08:00"
+      );
+    });
+
+    it("assigns the post-transition offset after fall-back", () => {
+      // US fall back 2026: November 1, 02:00 local -> PST (-08:00).
+      expect(normalizeDateTime("2026-11-01T03:30:00", "America/Los_Angeles")).toBe(
+        "2026-11-01T03:30:00-08:00"
+      );
+    });
   });
 });
