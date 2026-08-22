@@ -361,6 +361,109 @@ Related: Use get_family_members to get category IDs for assignments.`,
     }
   );
 
+  // create_calendar_events tool (bulk)
+  server.tool(
+    "create_calendar_events",
+    `Create MANY calendar events in one call (bulk).
+
+Use this when adding a whole list of events at once — a school calendar,
+a season schedule, a list of birthdays — instead of calling
+create_calendar_event repeatedly.
+
+Each event needs: summary, startsAt, endsAt (ISO format; date-only like
+"2026-09-02" is fine for all-day events — set allDay on the event).
+Shared options (categoryNames, categoryIds, calendarId/calendarAccountId,
+timezone, kind) apply to every event in the batch.
+
+Events are created one at a time; one failure never aborts the rest.
+Returns a per-event report: what was created (with IDs) and what failed (with reasons).`,
+    {
+      events: z
+        .array(
+          z.object({
+            summary: z.string().describe("Event title"),
+            startsAt: z.string().describe("Start (ISO; without an offset, interpreted in the frame timezone)"),
+            endsAt: z.string().describe("End (ISO; without an offset, interpreted in the frame timezone)"),
+            allDay: z.boolean().optional().default(false).describe("All-day event"),
+            description: z.string().optional().describe("Notes"),
+            location: z.string().optional().describe("Location"),
+          })
+        )
+        .min(1)
+        .max(200)
+        .describe("Events to create (max 200 per call)"),
+      categoryNames: z
+        .array(z.string())
+        .optional()
+        .describe("Family member names to assign to EVERY event (e.g., ['Dad', 'Mom'])"),
+      categoryIds: z.array(z.string()).optional().describe("Family member IDs to assign to EVERY event"),
+      calendarId: z.string().optional().describe("Source calendar ID for every event (from get_source_calendars)"),
+      calendarAccountId: z.string().optional().describe("Source calendar account ID, paired with calendarId"),
+      timezone: z.string().optional().describe("Timezone for every event (defaults to the frame timezone)"),
+      kind: z.string().optional().describe("Event kind for every event (e.g., 'standard', 'birthday')"),
+    },
+    async ({ events, categoryNames, categoryIds, calendarId, calendarAccountId, timezone, kind }) => {
+      try {
+        const config = getConfig();
+        const categories = await mergeCategoryParams(categoryIds, categoryNames);
+        if (categories.error) {
+          return {
+            content: [{ type: "text" as const, text: categories.error }],
+            isError: true,
+          };
+        }
+
+        const created: string[] = [];
+        const failed: string[] = [];
+
+        for (const [i, ev] of events.entries()) {
+          try {
+            const result = await createCalendarEvent({
+              summary: ev.summary,
+              starts_at: normalizeDateTime(ev.startsAt, config.timezone),
+              ends_at: normalizeDateTime(ev.endsAt, config.timezone),
+              all_day: ev.allDay,
+              description: ev.description,
+              location: ev.location,
+              category_ids: categories.ids,
+              calendar_id: calendarId,
+              calendar_account_id: calendarAccountId,
+              timezone: timezone ?? config.timezone,
+              countdown_enabled: undefined,
+              kind: kind ?? "standard",
+            });
+            created.push(`- ${ev.summary} (${ev.startsAt}) — ID: ${result.id}`);
+          } catch (error) {
+            const message = error instanceof Error ? error.message : String(error);
+            failed.push(`- [${i}] ${ev.summary} (${ev.startsAt}): ${message}`);
+          }
+          // Be gentle on the API for large batches.
+          if (i < events.length - 1) {
+            await new Promise((resolve) => setTimeout(resolve, 150));
+          }
+        }
+
+        const lines = [`Created ${created.length} of ${events.length} events.`];
+        if (created.length > 0) {
+          lines.push("", "Created:", ...created);
+        }
+        if (failed.length > 0) {
+          lines.push("", "FAILED (fix and retry just these):", ...failed);
+        }
+
+        return {
+          content: [{ type: "text" as const, text: lines.join("\n") }],
+          isError: created.length === 0,
+        };
+      } catch (error) {
+        return {
+          content: [{ type: "text" as const, text: formatErrorForMcp(error) }],
+          isError: true,
+        };
+      }
+    }
+  );
+
   // update_calendar_event tool
   server.tool(
     "update_calendar_event",
