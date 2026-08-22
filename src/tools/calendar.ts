@@ -335,17 +335,18 @@ Related: Use get_family_members to get category IDs for assignments.`,
             isError: true,
           };
         }
+        const effectiveTimezone = timezone ?? config.timezone;
         const event = await createCalendarEvent({
           summary,
-          starts_at: normalizeDateTime(startsAt, config.timezone),
-          ends_at: normalizeDateTime(endsAt, config.timezone),
+          starts_at: normalizeDateTime(startsAt, effectiveTimezone),
+          ends_at: normalizeDateTime(endsAt, effectiveTimezone),
           all_day: allDay,
           description,
           location,
           category_ids: categories.ids,
           calendar_id: calendarId,
           calendar_account_id: calendarAccountId,
-          timezone: timezone ?? config.timezone,
+          timezone: effectiveTimezone,
           rrule,
           countdown_enabled: countdownEnabled,
           kind: kind ?? "standard",
