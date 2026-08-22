@@ -4,28 +4,38 @@
   "display_name": "Skylight Calendar",
   "version": "2.0.1",
   "description": "Query and manage your Skylight family calendar, chores, lists, and rewards",
-  "long_description": "Connect Claude to your Skylight Calendar account for natural-language access to family calendars, chores, grocery and to-do lists, tasks, family members, and rewards. Built on top of the reverse-engineered Skylight API. This is a maintained continuation of TheEagleByte/skylight-mcp.",
+  "long_description": "Connect Claude to your Skylight Calendar account for natural-language access to family calendars, chores (including Up For Grabs), grocery and to-do lists, tasks, family members, and rewards. Built on top of the reverse-engineered Skylight API. Maintained continuation of rjhalvorson/skylight-mcp (itself a continuation of TheEagleByte/skylight-mcp).",
   "author": {
-    "name": "rjhalvorson",
-    "email": "rjhalvorson@gmail.com",
-    "url": "https://github.com/rjhalvorson"
+    "name": "drpottsy",
+    "url": "https://github.com/pottsy17"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/rjhalvorson/skylight-mcp"
+    "url": "https://github.com/pottsy17/skylight-mcp"
   },
-  "homepage": "https://github.com/rjhalvorson/skylight-mcp#readme",
-  "documentation": "https://github.com/rjhalvorson/skylight-mcp#readme",
-  "support": "https://github.com/rjhalvorson/skylight-mcp/issues",
+  "homepage": "https://github.com/pottsy17/skylight-mcp#readme",
+  "documentation": "https://github.com/pottsy17/skylight-mcp#readme",
+  "support": "https://github.com/pottsy17/skylight-mcp/issues",
   "license": "MIT",
-  "privacy_policies": ["https://www.skylightframe.com/privacy/"],
-  "keywords": ["mcp", "skylight", "calendar", "family", "chores", "lists"],
+  "privacy_policies": [
+    "https://www.skylightframe.com/privacy/"
+  ],
+  "keywords": [
+    "mcp",
+    "skylight",
+    "calendar",
+    "family",
+    "chores",
+    "lists"
+  ],
   "server": {
     "type": "node",
     "entry_point": "dist/index.js",
     "mcp_config": {
       "command": "node",
-      "args": ["${__dirname}/dist/index.js"],
+      "args": [
+        "${__dirname}/dist/index.js"
+      ],
       "env": {
         "SKYLIGHT_EMAIL": "${user_config.email}",
         "SKYLIGHT_PASSWORD": "${user_config.password}",
@@ -36,7 +46,11 @@
   },
   "tools_generated": true,
   "compatibility": {
-    "platforms": ["darwin", "win32", "linux"],
+    "platforms": [
+      "darwin",
+      "win32",
+      "linux"
+    ],
     "runtimes": {
       "node": ">=20.0.0"
     }
