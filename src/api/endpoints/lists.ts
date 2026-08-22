@@ -41,12 +41,20 @@ export async function getListWithItems(listId: string): Promise<GetListWithItems
 }
 
 /**
- * Find a list by name (case-insensitive)
+ * Find a list by name (case-insensitive, exact-over-partial).
+ * Returns undefined when nothing matches OR when a partial match is
+ * ambiguous — callers use this to target updates and deletes, and a
+ * destructive write must never guess between "Groceries" and "Groceries (camping)".
  */
 export async function findListByName(name: string): Promise<ListResource | undefined> {
   const lists = await getLists();
   const lowerName = name.toLowerCase();
-  return lists.find((list) => list.attributes.label.toLowerCase().includes(lowerName));
+  const exact = lists.filter((list) => list.attributes.label.toLowerCase() === lowerName);
+  if (exact.length > 0) {
+    return exact.length === 1 ? exact[0] : undefined;
+  }
+  const partial = lists.filter((list) => list.attributes.label.toLowerCase().includes(lowerName));
+  return partial.length === 1 ? partial[0] : undefined;
 }
 
 /**
