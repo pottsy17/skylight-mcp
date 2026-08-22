@@ -5,13 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.1] - 2026-08-21
+
+### Fixed
+
+- **`get_chores` now returns "Up For Grabs" chores.** 2.1.0 could create them but not read them back; the chores endpoint omits unassigned chores unless an opt-in `include_up_for_grabs=true` query parameter is sent — undocumented, absent from the OpenAPI spec, and not discoverable by probing (we tried `filter=up_for_grabs`, date windows, and version headers, all negative). Captured from the Skylight web app's own request. `get_chores` sends it by default and labels the results; opt out with `includeUpForGrabs: false`. Verified end-to-end on a live frame: create → visible with flag → absent without it → delete → gone.
+
 ## [2.1.0] - 2026-08-20
 
 First release as `@drpottsy/skylight-mcp` — a maintained continuation of `@rjhalvorson/skylight-mcp` (see README note). Everything below plus the previously-unreleased fixes from the upstream PR queue.
 
 ### Added
 
-- **"Up For Grabs" chore support** (upstream issue [#5](https://github.com/rjhalvorson/skylight-mcp/issues/5), implemented from the captured request in that issue — thanks to its author). `create_chore` accepts `upForGrabs: true` to create an unassigned chore any family member can claim; `assignee` is now optional (required unless `upForGrabs`). Verified live: the API stores and echoes `up_for_grabs: true` with no category. Known limitation, verified by probing: Up For Grabs chores are **not returned** by the chores read endpoint under any known parameter combination, so `get_chores` cannot show them — the create confirmation says so.
+- **"Up For Grabs" chore support** (upstream issue [#5](https://github.com/rjhalvorson/skylight-mcp/issues/5), implemented from the captured request in that issue — thanks to its author). `create_chore` accepts `upForGrabs: true` to create an unassigned chore any family member can claim; `assignee` is now optional (required unless `upForGrabs`). Verified live: the API stores and echoes `up_for_grabs: true` with no category. (The read-side limitation noted in 2.1.0 was solved in 2.1.1 — see below.)
 
 ### Fixed
 
