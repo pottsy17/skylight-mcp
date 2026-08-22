@@ -115,15 +115,10 @@ jobs:
           echo "MCPB_FILE=${OUTPUT}" >> "$GITHUB_OUTPUT"
           ls -lh "${OUTPUT}"
 
-      - name: Publish to npm
-        # TODO: revert to `npm publish --access public --provenance` once
-        # Trusted Publishing on npm is confirmed working for this package.
-        # The v2.0.0 bootstrap used NPM_TOKEN because the package didn't
-        # exist; Trusted Publishing was later configured but still returning
-        # 404 on OIDC publish attempts as of v2.0.1 — cause TBD.
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npm publish --access public
+      # npm publish is intentionally NOT done in CI on this fork: the account
+      # uses passkey-based 2FA (no bypass token), so publishing is a manual
+      # `npm publish` on the maintainer's machine with a browser/Touch ID
+      # approval. CI's job is the GitHub release + .mcpb bundle only.
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
