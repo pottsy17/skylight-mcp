@@ -76,7 +76,9 @@ export class SkylightClient {
     console.error("Logging in to Skylight...");
     const result = await login(email, password);
     this.subscriptionStatus = result.subscriptionStatus as SubscriptionStatus;
-    console.error(`Logged in as ${result.email}${result.subscriptionStatus ? ` (${result.subscriptionStatus})` : ""}`);
+    // Mask the account email in logs — stderr often ends up in shared MCP logs.
+    const maskedEmail = result.email.replace(/^(.).*(@.*)$/, "$1***$2");
+    console.error(`Logged in as ${maskedEmail}${result.subscriptionStatus ? ` (${result.subscriptionStatus})` : ""}`);
     return { token: result.token };
   }
 
