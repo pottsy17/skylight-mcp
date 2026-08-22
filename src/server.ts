@@ -14,6 +14,7 @@ import { registerTaskTools } from "./tools/tasks.js";
 import { registerFamilyTools } from "./tools/family.js";
 import { registerRewardTools } from "./tools/rewards.js";
 import { registerMiscTools } from "./tools/misc.js";
+import { registerMessageTools } from "./tools/messages.js";
 import { registerMealTools } from "./tools/meals.js";
 import { registerPhotoTools } from "./tools/photos.js";
 
