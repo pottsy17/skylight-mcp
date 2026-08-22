@@ -206,9 +206,14 @@ export class SkylightClient {
     }
 
     // Some endpoints (notably DELETE) return 200/204 with an empty body;
-    // response.json() would throw on those, making a successful call look failed.
+    // response.json() would throw on those, making a successful call look
+    // failed. But an empty body on a GET is a server anomaly — fabricating {}
+    // there would make callers report "no data" for what is really an error.
     const text = await response.text();
     if (!text) {
+      if (method === "GET") {
+        throw new SkylightError(`Empty response body from ${url}`, "EMPTY_RESPONSE", response.status, true);
+      }
       return {} as T;
     }
     return JSON.parse(text) as T;
