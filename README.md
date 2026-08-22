@@ -163,6 +163,9 @@ SKYLIGHT_TIMEZONE=America/New_York
 |------|-------------|
 | `get_calendar_events` | Get calendar events for a date range |
 | `get_source_calendars` | List connected calendar sources (Google, iCloud, etc.) |
+| `create_calendar_event` | Create one event (names or IDs for assignment) |
+| `create_calendar_events` | Bulk-create up to 200 events in one call |
+| `update_calendar_event` / `delete_calendar_event` | Update or remove events |
 
 ### Chore Tools
 
@@ -188,7 +191,8 @@ SKYLIGHT_TIMEZONE=America/New_York
 
 | Tool | Description |
 |------|-------------|
-| `get_family_members` | Get family member profiles |
+| `get_family_members` | Get family member profiles (with category IDs) |
+| `get_messages` | Read the frame's message/photo feed |
 | `get_frame_info` | Get household/frame information |
 | `get_devices` | List Skylight devices |
 

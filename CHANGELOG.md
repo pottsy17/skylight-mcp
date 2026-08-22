@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2026-08-21
+
+### Added
+
+- **`create_calendar_events` — bulk event creation.** Create up to 200 events in one call (a school year, a season schedule, a birthday list). Shared assignment options (`categoryNames`/`categoryIds`, source calendar, timezone, kind) apply to the whole batch. Events are created sequentially with a small delay; **one failure never aborts the rest** — the result reports every created event with its ID and every failure with its reason, so a partial batch is repairable instead of mysterious. Verified live: 3 created → 3 read back → 3 deleted.
+- **`get_messages` — read the frame's message/photo feed.** First message support in any version of this MCP. Read-only: the send path has never been captured from a real client, and this project does not guess at write endpoints (see 2.1.1's `include_up_for_grabs` for why capture beats probing).
+
 ## [2.1.2] - 2026-08-21
 
 ### Fixed
