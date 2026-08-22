@@ -5,8 +5,6 @@ node_modules/
 dist/
 
 # Environment files
-.env
-.env.local
 .env.*.local
 
 # IDE
@@ -28,3 +26,7 @@ coverage/
 
 # Plan folder (local planning docs)
 ../plan/
+
+# Secrets — wildcard, house law (literal names let .env.backup slip once)
+.env*
+!.env.example
