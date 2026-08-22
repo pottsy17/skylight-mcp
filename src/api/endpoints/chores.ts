@@ -12,6 +12,11 @@ export interface GetChoresOptions {
   before?: string;
   includeLate?: boolean;
   filterLinkedToProfile?: boolean;
+  /**
+   * Include unassigned "Up For Grabs" chores. The API omits them unless this
+   * opt-in flag is sent (captured from the Skylight web app).
+   */
+  includeUpForGrabs?: boolean;
 }
 
 export interface GetChoresResult {
