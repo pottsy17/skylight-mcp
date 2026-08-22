@@ -341,23 +341,53 @@ async function exchangeAuthorizationCode(code: string, codeVerifier: string): Pr
   return token;
 }
 
-async function detectSubscriptionStatus(token: string): Promise<string | null> {
+/**
+ * Determine the account's subscription tier.
+ *
+ * Reads `/api/user` — the authoritative source, which states the tier outright
+ * in `data.attributes.subscription_status` ("plus", "basic", …). Falls back to
+ * the structured entitlement fields on `/api/plus_access` if that call fails.
+ *
+ * Deliberately fails CLOSED (never assumes "plus" when uncertain): a false
+ * "plus" registers Plus-only tools that 403 at call time, which reads to the
+ * caller as a broken server rather than an unavailable feature. An earlier
+ * version substring-matched `/api/plus_access` for patterns that do not appear
+ * in its real response and defaulted to "plus" on no-match, so every basic
+ * account was detected as Plus.
+ */
+export async function detectSubscriptionStatus(token: string): Promise<string | null> {
+  const headers = {
+    Accept: "application/json",
+    Authorization: `Bearer ${token}`,
+    Origin: SKYLIGHT_WEB_APP_URL,
+    Referer: `${SKYLIGHT_WEB_APP_URL}/`,
+    "Skylight-Api-Version": SKYLIGHT_API_VERSION,
+    "User-Agent": "SkylightMobile (web)",
+  };
+
+  // Authoritative: the user record names the tier explicitly.
   try {
-    const response = await fetch(`${SKYLIGHT_BASE_URL}/api/plus_access`, {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        Authorization: `Bearer ${token}`,
-        Origin: SKYLIGHT_WEB_APP_URL,
-        Referer: `${SKYLIGHT_WEB_APP_URL}/`,
-        "Skylight-Api-Version": SKYLIGHT_API_VERSION,
-        "User-Agent": "SkylightMobile (web)",
-      },
-    });
+    const response = await fetch(`${SKYLIGHT_BASE_URL}/api/user`, { method: "GET", headers });
+    if (response.ok) {
+      const body = (await response.json()) as { data?: { attributes?: { subscription_status?: unknown } } };
+      const status = body?.data?.attributes?.subscription_status;
+      if (typeof status === "string" && status.trim()) {
+        return status.trim().toLowerCase();
+      }
+    } else {
+      response.body?.cancel();
+    }
+  } catch {
+    // Fall through to the entitlement probe.
+  }
+
+  // Fallback: infer from entitlements rather than string-matching the payload.
+  try {
+    const response = await fetch(`${SKYLIGHT_BASE_URL}/api/plus_access`, { method: "GET", headers });
 
     if (response.status === 401 || response.status === 403 || response.status === 404) {
       response.body?.cancel();
-      return "free";
+      return "basic";
     }
 
     if (!response.ok) {
@@ -365,21 +395,20 @@ async function detectSubscriptionStatus(token: string): Promise<string | null> {
       return null;
     }
 
-    const rawBody = await response.text();
-    if (!rawBody.trim()) {
-      return "plus";
-    }
+    const body = (await response.json()) as {
+      data?: {
+        subscriptions?: unknown;
+        shares?: unknown;
+        bundle_entitlement?: { available?: unknown };
+      };
+    };
+    const data = body?.data ?? {};
+    const entitled =
+      (Array.isArray(data.subscriptions) && data.subscriptions.length > 0) ||
+      (Array.isArray(data.shares) && data.shares.length > 0) ||
+      data.bundle_entitlement?.available === true;
 
-    const body = JSON.parse(rawBody) as unknown;
-    const text = JSON.stringify(body).toLowerCase();
-    if (text.includes("\"subscription_status\":\"plus\"") || text.includes("\"plus\":true") || text.includes("\"has_access\":true")) {
-      return "plus";
-    }
-    if (text.includes("\"subscription_status\":\"free\"") || text.includes("\"plus\":false") || text.includes("\"has_access\":false")) {
-      return "free";
-    }
-
-    return "plus";
+    return entitled ? "plus" : "basic";
   } catch {
     return null;
   }
