@@ -133,7 +133,7 @@ jobs:
 
             **Claude Desktop (easiest):** Download `${{ steps.pack.outputs.MCPB_FILE }}` below and double-click to install.
 
-            **npm:** `npx @rjhalvorson/skylight-mcp`
+            **npm:** `npx @drpottsy/skylight-mcp`
           files: ${{ steps.pack.outputs.MCPB_FILE }}
           fail_on_unmatched_files: true
           draft: false
