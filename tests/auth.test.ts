@@ -87,12 +87,14 @@ describe("auth", () => {
         });
       }
 
-      if (url === "https://app.ourskylight.com/api/plus_access") {
+      if (url === "https://app.ourskylight.com/api/user") {
         expect(init?.headers).toBeDefined();
         const headers = new Headers(init?.headers);
         expect(headers.get("authorization")).toBe("Bearer bearer-token-123");
         expect(headers.get("skylight-api-version")).toBe("2026-03-01");
-        return textResponse(200, "");
+        return jsonResponse(200, {
+          data: { id: "1", type: "user", attributes: { subscription_status: "plus" } },
+        });
       }
 
       throw new Error(`Unexpected fetch call: ${url}`);
