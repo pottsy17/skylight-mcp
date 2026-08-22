@@ -45,8 +45,13 @@ Unassigned "Up For Grabs" chores are included by default and labelled as such.`,
         .optional()
         .default("pending")
         .describe("Filter by completion status"),
+      includeUpForGrabs: z
+        .boolean()
+        .optional()
+        .default(true)
+        .describe("Include unassigned 'Up For Grabs' chores that any family member can claim"),
     },
-    async ({ date, dateEnd, includeLate, assignee, status }) => {
+    async ({ date, dateEnd, includeLate, assignee, status, includeUpForGrabs }) => {
       try {
         const config = getConfig();
         const startDate = date ? parseDate(date, config.timezone) : getTodayDate(config.timezone);
@@ -56,6 +61,7 @@ Unassigned "Up For Grabs" chores are included by default and labelled as such.`,
           after: startDate,
           before: endDate,
           includeLate: includeLate ?? true,
+          includeUpForGrabs: includeUpForGrabs ?? true,
         });
 
         let chores = result.chores;
