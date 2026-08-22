@@ -290,9 +290,6 @@ The chore will appear on the Skylight display.`,
           parts.push(`Assigned to: ${assignee}`);
         } else if (upForGrabs) {
           parts.push(`Assigned to: Up For Grabs (unassigned pool)`);
-          parts.push(
-            `Note: Up For Grabs chores don't appear in get_chores results (Skylight API limitation) — check the frame or app to see it.`
-          );
         }
 
         if (chore.attributes.recurring) {
