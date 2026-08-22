@@ -571,10 +571,11 @@ Notes:
             isError: true,
           };
         }
+        const effectiveTimezone = timezone ?? config.timezone;
         const updates: Record<string, unknown> = {};
         if (summary !== undefined) updates.summary = summary;
-        if (startsAt !== undefined) updates.starts_at = normalizeDateTime(startsAt, config.timezone);
-        if (endsAt !== undefined) updates.ends_at = normalizeDateTime(endsAt, config.timezone);
+        if (startsAt !== undefined) updates.starts_at = normalizeDateTime(startsAt, effectiveTimezone);
+        if (endsAt !== undefined) updates.ends_at = normalizeDateTime(endsAt, effectiveTimezone);
         if (allDay !== undefined) updates.all_day = allDay;
         if (description !== undefined) updates.description = description;
         if (location !== undefined) updates.location = location;
