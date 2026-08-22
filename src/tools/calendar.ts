@@ -421,27 +421,37 @@ Returns a per-event report: what was created (with IDs) and what failed (with re
           };
         }
 
+        const effectiveTimezone = timezone ?? config.timezone;
         const created: string[] = [];
         const failed: string[] = [];
+        const skipped: string[] = [];
 
         for (const [i, ev] of events.entries()) {
           try {
             const result = await createCalendarEvent({
               summary: ev.summary,
-              starts_at: normalizeDateTime(ev.startsAt, config.timezone),
-              ends_at: normalizeDateTime(ev.endsAt, config.timezone),
+              starts_at: normalizeDateTime(ev.startsAt, effectiveTimezone),
+              ends_at: normalizeDateTime(ev.endsAt, effectiveTimezone),
               all_day: ev.allDay,
               description: ev.description,
               location: ev.location,
               category_ids: categories.ids,
               calendar_id: calendarId,
               calendar_account_id: calendarAccountId,
-              timezone: timezone ?? config.timezone,
+              timezone: effectiveTimezone,
               countdown_enabled: undefined,
               kind: kind ?? "standard",
             });
             created.push(`- ${ev.summary} (${ev.startsAt}) — ID: ${result.id}`);
           } catch (error) {
+            if (error instanceof RateLimitError) {
+              // Stop hammering a rate-limited API: report the rest as skipped
+              // so the caller can retry exactly those.
+              skipped.push(
+                ...events.slice(i).map((rest, j) => `- [${i + j}] ${rest.summary} (${rest.startsAt})`)
+              );
+              break;
+            }
             const message = error instanceof Error ? error.message : String(error);
             failed.push(`- [${i}] ${ev.summary} (${ev.startsAt}): ${message}`);
           }
@@ -451,12 +461,18 @@ Returns a per-event report: what was created (with IDs) and what failed (with re
           }
         }
 
-        const lines = [`Created ${created.length} of ${events.length} events.`];
+        const complete = created.length === events.length;
+        const lines = [
+          `${complete ? "Created" : "⚠ PARTIAL: created"} ${created.length} of ${events.length} events.`,
+        ];
         if (created.length > 0) {
           lines.push("", "Created:", ...created);
         }
         if (failed.length > 0) {
           lines.push("", "FAILED (fix and retry just these):", ...failed);
+        }
+        if (skipped.length > 0) {
+          lines.push("", "SKIPPED — the API rate-limited us; retry these after a pause:", ...skipped);
         }
 
         return {
