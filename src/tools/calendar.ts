@@ -26,12 +26,19 @@ async function mergeCategoryParams(
   }
 
   const resolution = await resolveCategoryNames(categoryNames);
+  const problems: string[] = [];
   if (resolution.unresolved.length > 0) {
+    problems.push(
+      `Could not find family member(s): ${resolution.unresolved.map((n) => `"${n}"`).join(", ")}.`
+    );
+  }
+  for (const amb of resolution.ambiguous) {
+    problems.push(`"${amb.name}" matches several members (${amb.options.join(", ")}) — use the exact name.`);
+  }
+  if (problems.length > 0) {
     return {
       ids: undefined,
-      error:
-        `Could not find family member(s): ${resolution.unresolved.map((n) => `"${n}"`).join(", ")}.\n` +
-        `Available: ${resolution.available.join(", ") || "none found"}`,
+      error: `${problems.join("\n")}\nAvailable: ${resolution.available.join(", ") || "none found"}`,
     };
   }
 
