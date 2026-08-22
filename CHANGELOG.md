@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.2] - 2026-08-21
+
+### Fixed
+
+- **Plus detection reported every account as Plus.** Subscription tier was inferred by substring-matching the `/api/plus_access` payload for patterns (`"subscription_status":"plus"`, `"plus":true`, `"has_access":true`) that do not appear in its actual response, then **defaulting to `"plus"` on no match** — so basic accounts were detected as Plus and the server registered rewards, meals, and photos tools that 403 at call time. Detection now reads `data.attributes.subscription_status` from `/api/user` (which states the tier outright, including the previously-unhandled value `"basic"`), falls back to the structured entitlement fields on `/api/plus_access` (`subscriptions`, `shares`, `bundle_entitlement.available`) rather than string matching, and **fails closed** — it never assumes Plus when uncertain. Verified against a live basic account; 9 regression tests added.
+
 ## [2.1.1] - 2026-08-21
 
 ### Fixed
