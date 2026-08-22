@@ -50,6 +50,7 @@ export async function createServer(): Promise<{
   registerTaskTools(server);
   registerFamilyTools(server);
   registerMiscTools(server);
+  registerMessageTools(server);
 
   // Register Plus-only tools (hidden for non-Plus users)
   if (hasPlus) {
