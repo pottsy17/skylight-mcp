@@ -124,26 +124,42 @@ export function formatDateForDisplay(dateStr: string): string {
  * Get the UTC offset (e.g. "-07:00", "+05:30") that applies to a given local
  * date in a given IANA timezone. Accounts for DST.
  */
-function getOffsetForDateInTimezone(localDateTime: string, timezone: string): string | null {
-  // Treat the naive local datetime as a UTC instant for the purpose of asking
-  // Intl what offset the target zone uses near that wall-clock moment. This is
-  // accurate for all dates except those within DST transition gaps/overlaps,
-  // which we accept as a documented edge case.
-  const refInstant = new Date(localDateTime.endsWith("Z") ? localDateTime : `${localDateTime}Z`);
-  if (isNaN(refInstant.getTime())) {
-    return null;
-  }
+function offsetAtInstant(instant: Date, timezone: string): string | null {
   const parts = new Intl.DateTimeFormat("en-US", {
     timeZone: timezone,
     timeZoneName: "longOffset",
     year: "numeric",
-  }).formatToParts(refInstant);
+  }).formatToParts(instant);
   const tzName = parts.find((p) => p.type === "timeZoneName")?.value;
   if (!tzName) return null;
   // longOffset returns "GMT-07:00", "GMT+05:30", or bare "GMT" for UTC
   if (tzName === "GMT") return "+00:00";
   const match = tzName.match(/^GMT([+-]\d{2}:\d{2})$/);
   return match ? match[1] : null;
+}
+
+function offsetToMinutes(offset: string): number {
+  const sign = offset.startsWith("-") ? -1 : 1;
+  const [h, m] = offset.slice(1).split(":").map(Number);
+  return sign * (h * 60 + m);
+}
+
+function getOffsetForDateInTimezone(localDateTime: string, timezone: string): string | null {
+  // Two-pass fixed-point: first guess the offset by treating the wall-clock
+  // string as a UTC instant, then re-ask at the corrected instant. One pass
+  // alone mis-assigns several hours around each DST transition (e.g. LA
+  // 2026-03-08 03:30 got -08:00 instead of -07:00); the second pass converges
+  // for every time except inside the nonexistent spring-forward hour, where
+  // either neighboring offset is a defensible answer.
+  const refInstant = new Date(localDateTime.endsWith("Z") ? localDateTime : `${localDateTime}Z`);
+  if (isNaN(refInstant.getTime())) {
+    return null;
+  }
+  const firstGuess = offsetAtInstant(refInstant, timezone);
+  if (!firstGuess) return null;
+
+  const correctedInstant = new Date(refInstant.getTime() - offsetToMinutes(firstGuess) * 60_000);
+  return offsetAtInstant(correctedInstant, timezone) ?? firstGuess;
 }
 
 /**
