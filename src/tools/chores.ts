@@ -18,8 +18,10 @@ Use this to answer:
 - "Show me this week's chores"
 - "What's on the chore chart?"
 - "What chores does [name] have?"
+- "What's up for grabs?" (unassigned chores anyone can claim)
 
-Returns chores with their assignees, due dates, and completion status.`,
+Returns chores with their assignees, due dates, and completion status.
+Unassigned "Up For Grabs" chores are included by default and labelled as such.`,
     {
       date: z
         .string()
