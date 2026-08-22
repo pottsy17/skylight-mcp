@@ -11,7 +11,7 @@ import {
 /**
  * Skylight subscription status types
  */
-export type SubscriptionStatus = "plus" | "free" | "trial" | null;
+export type SubscriptionStatus = "plus" | "basic" | "free" | "trial" | null;
 
 export interface RequestOptions {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
