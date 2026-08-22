@@ -175,6 +175,16 @@ async function fetchWithCookies(
   init: RequestInit,
   cookieJar: CookieJar
 ): Promise<Response> {
+  // Session cookies must never leave Skylight's origin. Some URLs passed here
+  // come from server-provided Location headers; without this check, a
+  // cross-origin redirect would replay the authenticated session cookies to
+  // an arbitrary host.
+  const origin = new URL(url).origin;
+  const allowedOrigin = new URL(SKYLIGHT_BASE_URL).origin;
+  if (origin !== allowedOrigin) {
+    throw new Error(`Refusing to send Skylight session cookies to unexpected origin: ${origin}`);
+  }
+
   const headers = new Headers(init.headers);
   const cookieHeader = cookieJar.toHeader();
 
