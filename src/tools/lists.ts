@@ -93,7 +93,9 @@ async function resolveListItemId(
   itemLabel?: string
 ): Promise<ItemResolutionResult> {
   if (itemId) {
-    return { success: true, id: itemId, label: itemLabel ?? itemId };
+    // When an explicit ID is given it wins; don't echo an unverified label
+    // alongside it — the confirmation must never claim more than we checked.
+    return { success: true, id: itemId, label: `item ${itemId}` };
   }
 
   if (!itemLabel) {
