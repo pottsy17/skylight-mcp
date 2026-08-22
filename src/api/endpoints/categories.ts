@@ -26,17 +26,29 @@ export function clearCategoriesCache(): void {
 }
 
 /**
- * Find a category by name (case-insensitive partial match)
+ * Match categories by name, case-insensitively. Exact matches win over
+ * partial matches so "Dad" never resolves to "Daddy" when both exist.
+ * Pure function, exported for tests.
+ */
+export function matchCategoriesByName(categories: CategoryResource[], name: string): CategoryResource[] {
+  const lower = name.toLowerCase();
+  const exact = categories.filter((cat) => cat.attributes.label?.toLowerCase() === lower);
+  if (exact.length > 0) {
+    return exact;
+  }
+  return categories.filter((cat) => cat.attributes.label?.toLowerCase().includes(lower));
+}
+
+/**
+ * Find a category by name (case-insensitive, exact-over-partial).
  * Categories represent family members like "Dad", "Mom", "Kids", etc.
+ * Returns undefined when nothing matches OR when a partial match is
+ * ambiguous — a destructive or assignment write must never guess.
  */
 export async function findCategoryByName(name: string): Promise<CategoryResource | undefined> {
   const categories = await getCategories();
-  const lowerName = name.toLowerCase();
-
-  return categories.find((cat) => {
-    const label = cat.attributes.label?.toLowerCase();
-    return label && (label === lowerName || label.includes(lowerName));
-  });
+  const matches = matchCategoriesByName(categories, name);
+  return matches.length === 1 ? matches[0] : undefined;
 }
 
 /**
