@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.1] - 2026-08-21
+
+Hardening release from an independent pre-publish review (Codex, cross-vendor). Six blocking findings, all fixed and regression-tested; v2.2.0 was never published to npm.
+
+### Fixed
+
+- **Name resolution can no longer guess on destructive or assignment writes.** Category (family member) and list name matching is now exact-over-partial with ambiguity rejection everywhere — previously "Dad" could resolve to "Daddy", and a partial list name could target the wrong list for update/delete. Ambiguous names return the candidates instead of acting. When an explicit ID is passed, confirmations no longer echo an unverified label alongside it.
+- **DST transition-day offsets.** Offset detection treated the wall-clock time as a UTC instant, so times from 02:00–09:59 on spring-forward day got the standard-time offset (events one hour late). Now a two-pass fixed-point; only the nonexistent spring-forward hour itself remains approximate.
+- **`timezone` parameter is respected for naive datetimes.** create/update/bulk normalized naive times with the frame timezone even when the caller passed a different `timezone`, producing an offset that contradicted the requested zone.
+- **Bulk create stops on rate limiting.** A 429 mid-batch now aborts the remainder and reports it as retryable "skipped" instead of hammering the API with the rest of the batch.
+- **OAuth session cookies are origin-locked.** The login flow's cookie jar now refuses to send Skylight session cookies to any origin other than app.ourskylight.com, closing a redirect-following path that could have replayed them cross-origin.
+- **Empty GET responses raise instead of masquerading as empty data.** The empty-body tolerance added in 2.1.1 for DELETEs no longer applies to GETs, where an empty 200 is a server anomaly, not "no results".
+
+### Changed
+
+- Bulk create reports lead with "⚠ PARTIAL" when any event failed.
+- The login log line masks the account email.
+
 ## [2.2.0] - 2026-08-21
 
 ### Added
