@@ -57,31 +57,37 @@ export async function findCategoryByName(name: string): Promise<CategoryResource
 export interface CategoryNameResolution {
   ids: string[];
   unresolved: string[];
+  /** Names that partially matched more than one category, with the options. */
+  ambiguous: { name: string; options: string[] }[];
   available: string[];
 }
 
 /**
  * Resolve a list of category (family member) names to category IDs.
- * Names that don't match are returned in `unresolved`; `available` lists
- * all category labels so callers can build a helpful error message.
+ * Exact matches beat partial matches; a partial match that fits several
+ * categories is reported as ambiguous rather than guessed at.
  */
 export async function resolveCategoryNames(names: string[]): Promise<CategoryNameResolution> {
+  const categories = await getCategories();
   const ids: string[] = [];
   const unresolved: string[] = [];
+  const ambiguous: { name: string; options: string[] }[] = [];
 
   for (const name of names) {
-    const match = await findCategoryByName(name);
-    if (match) {
-      ids.push(match.id);
-    } else {
+    const matches = matchCategoriesByName(categories, name);
+    if (matches.length === 1) {
+      ids.push(matches[0].id);
+    } else if (matches.length === 0) {
       unresolved.push(name);
+    } else {
+      ambiguous.push({ name, options: matches.map((m) => m.attributes.label ?? m.id) });
     }
   }
 
-  const categories = await getCategories();
   return {
     ids,
     unresolved,
+    ambiguous,
     available: categories.map((c) => c.attributes.label ?? c.id),
   };
 }
