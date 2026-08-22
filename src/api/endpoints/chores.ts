@@ -33,6 +33,7 @@ export async function getChores(options: GetChoresOptions = {}): Promise<GetChor
     after: options.after,
     before: options.before,
     include_late: options.includeLate,
+    include_up_for_grabs: options.includeUpForGrabs,
   };
 
   if (options.filterLinkedToProfile) {
