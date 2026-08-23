@@ -251,6 +251,10 @@ Parameters:
 - categoryIds: Family member IDs to associate with the event
 - categoryNames: Family member names (resolved to IDs automatically)
 
+IMPORTANT: assign at least one profile (categoryNames/categoryIds). Skylight's
+calendar views hide events that belong to no profile — the event will exist in
+the API but render nowhere in the app or on the frame.
+
 Returns: The created event details.
 
 Notes:
