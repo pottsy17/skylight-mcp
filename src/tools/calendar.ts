@@ -347,6 +347,12 @@ Related: Use get_family_members to get category IDs for assignments.`,
             isError: true,
           };
         }
+        if (!categories.ids || categories.ids.length === 0) {
+          return {
+            content: [{ type: "text" as const, text: NO_PROFILE_ERROR }],
+            isError: true,
+          };
+        }
         const effectiveTimezone = timezone ?? config.timezone;
         const event = await createCalendarEvent({
           summary,
