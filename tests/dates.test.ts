@@ -6,6 +6,7 @@ import {
   parseTime,
   formatDateForDisplay,
   normalizeDateTime,
+  expandAllDayEnd,
 } from "../src/utils/dates.js";
 
 describe("dates", () => {
