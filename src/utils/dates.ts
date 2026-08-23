@@ -174,6 +174,27 @@ function getOffsetForDateInTimezone(localDateTime: string, timezone: string): st
  * timezone can't be resolved — letting the API surface its own validation error
  * rather than us mangling the value.
  */
+/**
+ * Expand a date-only all-day end date to Skylight's exclusive-end convention.
+ *
+ * Skylight stores all-day events as start-midnight → NEXT-day-midnight (the
+ * end is exclusive), and its month view draws the event bar from that span —
+ * a zero-duration all-day event (start == end) exists in the API and shows in
+ * week/agenda views but is INVISIBLE in month view (zero-width bar). The
+ * server also floors any non-midnight end back to midnight, so end-of-day
+ * times like 23:59 silently revert; the only correct end is the next midnight.
+ *
+ * Given a date-only end ("2026-09-04", inclusive from the caller's view),
+ * returns the day after ("2026-09-05"). Anything that isn't a bare date is
+ * returned unchanged.
+ */
+export function expandAllDayEnd(endsAt: string): string {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(endsAt)) return endsAt;
+  const d = new Date(endsAt + "T12:00:00Z");
+  d.setUTCDate(d.getUTCDate() + 1);
+  return d.toISOString().slice(0, 10);
+}
+
 export function normalizeDateTime(input: string, timezone?: string): string {
   if (!input) return input;
   // Already has a timezone designator
