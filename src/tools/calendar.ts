@@ -246,7 +246,10 @@ Parameters:
 - summary (required): Event title (e.g., "Dentist Appointment")
 - startsAt (required): Start time in ISO format or natural language
 - endsAt (required): End time in ISO format or natural language
-- allDay: Set to true for all-day events
+- allDay: Set to true for all-day events. Use date-only values for startsAt and
+  endsAt; endsAt is the last day, INCLUSIVE (a one-day event has
+  startsAt == endsAt, e.g. both "2026-09-02" — the exclusive next-midnight end
+  Skylight stores is handled automatically)
 - description: Additional notes for the event
 - location: Where the event takes place
 - categoryIds: Family member IDs to associate with the event
