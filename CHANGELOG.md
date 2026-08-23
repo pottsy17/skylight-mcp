@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.2] - 2026-08-22
+
+### Changed
+
+- **Calendar creates now require at least one profile** (`categoryNames` or `categoryIds`), on both `create_calendar_event` and `create_calendar_events`. Skylight's calendar views hide any event that belongs to no profile — even with every profile selected in the filter — so a profile-less create produced an event that existed in the API but rendered nowhere in the app or on the frame (found live loading a 30-event school calendar that all landed invisible). Skylight's own web app refuses to create such events; the MCP now enforces the same rule with an explicit error instead of a silent no-show. Fix existing invisible events by adding profiles with `update_calendar_event`.
+
 ## [2.2.1] - 2026-08-21
 
 Hardening release from an independent pre-publish review (Codex, cross-vendor). Six blocking findings, all fixed and regression-tested; v2.2.0 was never published to npm.
