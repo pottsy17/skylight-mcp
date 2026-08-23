@@ -460,7 +460,7 @@ Returns a per-event report: what was created (with IDs) and what failed (with re
             const result = await createCalendarEvent({
               summary: ev.summary,
               starts_at: normalizeDateTime(ev.startsAt, effectiveTimezone),
-              ends_at: normalizeDateTime(ev.endsAt, effectiveTimezone),
+              ends_at: normalizeDateTime(ev.allDay ? expandAllDayEnd(ev.endsAt) : ev.endsAt, effectiveTimezone),
               all_day: ev.allDay,
               description: ev.description,
               location: ev.location,
