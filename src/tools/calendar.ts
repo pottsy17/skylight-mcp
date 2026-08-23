@@ -370,13 +370,11 @@ Related: Use get_family_members to get category IDs for assignments.`,
           kind: kind ?? "standard",
         });
 
-        const profileWarning =
-          categories.ids && categories.ids.length > 0 ? "" : `\n\n${NO_PROFILE_WARNING}`;
         return {
           content: [
             {
               type: "text" as const,
-              text: formatEventConfirmation("Created", event) + profileWarning,
+              text: formatEventConfirmation("Created", event),
             },
           ],
         };
