@@ -225,4 +225,26 @@ describe("dates", () => {
       );
     });
   });
+
+  describe("expandAllDayEnd", () => {
+    it("moves a date-only end to the next day (exclusive-end convention)", () => {
+      expect(expandAllDayEnd("2026-09-04")).toBe("2026-09-05");
+    });
+
+    it("crosses month and year boundaries", () => {
+      expect(expandAllDayEnd("2026-09-30")).toBe("2026-10-01");
+      expect(expandAllDayEnd("2026-12-31")).toBe("2027-01-01");
+    });
+
+    it("handles leap day", () => {
+      expect(expandAllDayEnd("2028-02-28")).toBe("2028-02-29");
+      expect(expandAllDayEnd("2028-02-29")).toBe("2028-03-01");
+    });
+
+    it("returns non-date-only inputs unchanged", () => {
+      expect(expandAllDayEnd("2026-09-04T00:00:00")).toBe("2026-09-04T00:00:00");
+      expect(expandAllDayEnd("2026-09-04T00:00:00-07:00")).toBe("2026-09-04T00:00:00-07:00");
+      expect(expandAllDayEnd("")).toBe("");
+    });
+  });
 });
