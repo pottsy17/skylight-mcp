@@ -401,6 +401,11 @@ Each event needs: summary, startsAt, endsAt (ISO format; date-only like
 Shared options (categoryNames, categoryIds, calendarId/calendarAccountId,
 timezone, kind) apply to every event in the batch.
 
+REQUIRED: at least one profile via categoryNames or categoryIds (applied to
+every event). Skylight's own apps enforce this, and the calendar views hide
+events that belong to no profile — they would exist in the API but render
+nowhere in the app or on the frame.
+
 Events are created one at a time; one failure never aborts the rest.
 Returns a per-event report: what was created (with IDs) and what failed (with reasons).`,
     {
