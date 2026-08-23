@@ -438,6 +438,12 @@ Returns a per-event report: what was created (with IDs) and what failed (with re
             isError: true,
           };
         }
+        if (!categories.ids || categories.ids.length === 0) {
+          return {
+            content: [{ type: "text" as const, text: NO_PROFILE_ERROR }],
+            isError: true,
+          };
+        }
 
         const effectiveTimezone = timezone ?? config.timezone;
         const created: string[] = [];
