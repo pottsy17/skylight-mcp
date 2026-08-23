@@ -357,7 +357,7 @@ Related: Use get_family_members to get category IDs for assignments.`,
         const event = await createCalendarEvent({
           summary,
           starts_at: normalizeDateTime(startsAt, effectiveTimezone),
-          ends_at: normalizeDateTime(endsAt, effectiveTimezone),
+          ends_at: normalizeDateTime(allDay ? expandAllDayEnd(endsAt) : endsAt, effectiveTimezone),
           all_day: allDay,
           description,
           location,
