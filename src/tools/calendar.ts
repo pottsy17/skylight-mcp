@@ -487,6 +487,9 @@ Returns a per-event report: what was created (with IDs) and what failed (with re
         if (skipped.length > 0) {
           lines.push("", "SKIPPED — the API rate-limited us; retry these after a pause:", ...skipped);
         }
+        if (created.length > 0 && !(categories.ids && categories.ids.length > 0)) {
+          lines.push("", NO_PROFILE_WARNING);
+        }
 
         return {
           content: [{ type: "text" as const, text: lines.join("\n") }],
