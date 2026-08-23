@@ -8,7 +8,7 @@ import {
   updateCalendarEvent,
   deleteCalendarEvent,
 } from "../api/endpoints/calendar.js";
-import { getTodayDate, parseDate, formatDateForDisplay, normalizeDateTime } from "../utils/dates.js";
+import { getTodayDate, parseDate, formatDateForDisplay, normalizeDateTime, expandAllDayEnd } from "../utils/dates.js";
 import { resolveCategoryNames } from "../api/endpoints/categories.js";
 import { formatErrorForMcp, RateLimitError } from "../utils/errors.js";
 import { getConfig } from "../config.js";
