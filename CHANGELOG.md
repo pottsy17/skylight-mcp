@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.3] - 2026-08-22
+
+### Fixed
+
+- **All-day events are no longer invisible in the month view.** Skylight stores all-day events as start-midnight → next-day-midnight (exclusive end) and the month view draws the bar from that span, so the zero-duration all-day events the create tools produced from date-only input (start == end) showed in week/agenda views but rendered nowhere in the month grid. The server also silently floors any non-midnight end back to midnight, so end-of-day workarounds revert. Both create tools now expand a date-only `endsAt` on all-day events to the next day automatically; `endsAt` is documented as the last day of the event, inclusive (a one-day event has `startsAt == endsAt`).
+
 ## [2.2.2] - 2026-08-22
 
 ### Changed
