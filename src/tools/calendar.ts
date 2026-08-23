@@ -396,8 +396,10 @@ Use this when adding a whole list of events at once — a school calendar,
 a season schedule, a list of birthdays — instead of calling
 create_calendar_event repeatedly.
 
-Each event needs: summary, startsAt, endsAt (ISO format; date-only like
-"2026-09-02" is fine for all-day events — set allDay on the event).
+Each event needs: summary, startsAt, endsAt (ISO format; for all-day events
+set allDay and use date-only values — endsAt is the last day, INCLUSIVE, so a
+one-day event has startsAt == endsAt, e.g. both "2026-09-02". The exclusive
+next-midnight end Skylight stores is handled automatically).
 Shared options (categoryNames, categoryIds, calendarId/calendarAccountId,
 timezone, kind) apply to every event in the batch.
 
