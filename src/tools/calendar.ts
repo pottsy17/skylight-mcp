@@ -71,9 +71,10 @@ function formatEventConfirmation(
 // Skylight's calendar views only render events that belong to at least one
 // profile — a profile-less event exists in the API but is invisible in the
 // app and on the frame, even with every profile selected in the filter
-// (proven live 2026-08-22). Warn whenever a create lands without profiles.
-const NO_PROFILE_WARNING =
-  "⚠ No profiles assigned — Skylight's calendar views HIDE events that belong to no profile (even with all profiles selected in the filter). The event exists in the API but will NOT render in the app or on the frame. Pass categoryNames (e.g. ['Mom']) or categoryIds; fix existing events with update_calendar_event.";
+// (proven live 2026-08-22; the official web app refuses to create one).
+// So the create tools require a profile instead of allowing a silent no-show.
+const NO_PROFILE_ERROR =
+  "At least one profile is required: pass categoryNames (e.g. ['Mom']) or categoryIds. Skylight's own apps enforce this too — an event with no profile is HIDDEN in every Skylight view, even with all profiles selected in the filter. Use get_family_members to see the available profiles.";
 
 export function registerCalendarTools(server: McpServer): void {
   // get_calendar_events tool
