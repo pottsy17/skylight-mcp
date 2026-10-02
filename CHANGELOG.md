@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **`get_calendar_events` now says who each event is for.** Every event gets a `Family members: Alex (ID: 123), Sam (ID: 456)` line, so an assistant can answer "who's going?" without guessing from titles. Events are requested with `include=categories`: without it the API returns only one `category` per event even when several profiles are attached. Events with no profile are flagged, since Skylight hides them. Reported in [rjhalvorson/skylight-mcp#12](https://github.com/rjhalvorson/skylight-mcp/issues/12) by @amitkoren, whose write-up documented the `include=categories` quirk.
+
 ## [2.2.3] - 2026-08-22
 
 ### Fixed

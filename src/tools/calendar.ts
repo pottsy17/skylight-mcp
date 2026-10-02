@@ -2,14 +2,15 @@ import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
 import {
-  getCalendarEvents,
+  getCalendarEventsWithCategories,
+  eventCategoryIds,
   getSourceCalendars,
   createCalendarEvent,
   updateCalendarEvent,
   deleteCalendarEvent,
 } from "../api/endpoints/calendar.js";
 import { getTodayDate, parseDate, formatDateForDisplay, normalizeDateTime, expandAllDayEnd } from "../utils/dates.js";
-import { resolveCategoryNames } from "../api/endpoints/categories.js";
+import { resolveCategoryNames, getCategories } from "../api/endpoints/categories.js";
 import { formatErrorForMcp, RateLimitError } from "../utils/errors.js";
 import { getConfig } from "../config.js";
 
@@ -76,6 +77,24 @@ function formatEventConfirmation(
 const NO_PROFILE_ERROR =
   "At least one profile is required: pass categoryNames (e.g. ['Mom']) or categoryIds. Skylight's own apps enforce this too — an event with no profile is HIDDEN in every Skylight view, even with all profiles selected in the filter. Use get_family_members to see the available profiles.";
 
+/**
+ * "Family members: Alex (ID: 1), Sam (ID: 2)" for an event's category IDs.
+ * Pure, exported for tests.
+ */
+export function formatEventMembers(
+  categoryIds: string[],
+  labels: Map<string, string | null>
+): string {
+  if (categoryIds.length === 0) {
+    return "Family members: none (Skylight hides events with no profile)";
+  }
+  const members = categoryIds.map((id) => {
+    const label = labels.get(id);
+    return label ? `${label} (ID: ${id})` : `ID ${id}`;
+  });
+  return `Family members: ${members.join(", ")}`;
+}
+
 export function registerCalendarTools(server: McpServer): void {
   // get_calendar_events tool
   server.tool(
@@ -86,8 +105,10 @@ Use this to answer questions like:
 - "What's on my calendar today?"
 - "What do we have scheduled this weekend?"
 - "Are there any events on Friday?"
+- "Who's going to the dentist appointment?"
 
-Returns a list of events with their titles, times, and details.`,
+Returns a list of events with their titles, times, details, and the family
+members (profiles) each event belongs to, with their IDs.`,
     {
       date: z
         .string()
@@ -104,7 +125,7 @@ Returns a list of events with their titles, times, and details.`,
         const startDate = date ? parseDate(date, config.timezone) : getTodayDate(config.timezone);
         const endDate = dateEnd ? parseDate(dateEnd, config.timezone) : startDate;
 
-        const events = await getCalendarEvents({
+        const { events, categories } = await getCalendarEventsWithCategories({
           dateMin: startDate,
           dateMax: endDate,
           timezone: config.timezone,
@@ -125,6 +146,20 @@ Returns a list of events with their titles, times, and details.`,
           };
         }
 
+        // Family member names, from `included`; if any ID is missing there,
+        // fall back to the (cached) categories list. Best-effort: on failure
+        // the line still shows the IDs.
+        const labels = new Map(categories.map((c) => [c.id, c.attributes.label]));
+        if (events.some((e) => eventCategoryIds(e).some((id) => !labels.has(id)))) {
+          try {
+            for (const c of await getCategories()) {
+              if (!labels.has(c.id)) labels.set(c.id, c.attributes.label);
+            }
+          } catch {
+            // names unavailable; IDs below are still correct
+          }
+        }
+
         // Format events for display
         const eventList = events
           .map((event) => {
@@ -137,6 +172,8 @@ Returns a list of events with their titles, times, and details.`,
                 parts.push(`  ${key}: ${value}`);
               }
             }
+
+            parts.push(`  ${formatEventMembers(eventCategoryIds(event), labels)}`);
 
             return `- Event (ID: ${event.id})\n${parts.join("\n")}`;
           })

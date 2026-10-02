@@ -138,10 +138,23 @@ export interface CalendarEventAttributes {
   [key: string]: unknown;
 }
 
+// Without include=categories the API returns only a single `category` per
+// event, even when the event has several profiles. With it, `categories`
+// carries the full list and the category resources arrive in `included`.
+export interface CalendarEventRelationships {
+  category?: {
+    data: JsonApiResourceId | null;
+  };
+  categories?: {
+    data: JsonApiResourceId[];
+  };
+}
+
 export interface CalendarEventResource {
   type: "calendar_event";
   id: string;
   attributes: CalendarEventAttributes;
+  relationships?: CalendarEventRelationships;
 }
 
 // Device types
