@@ -61,9 +61,10 @@ if (events.length === 0) console.log("(No events this week, so nothing to compar
 // 2. Chores: mark one done, read back, put it back
 console.log("\n=== 2. Chore update ===");
 const { chores } = await getChores({ after: today, before: weekOut, includeLate: true, includeUpForGrabs: true });
-const pending = chores.find((c) => c.attributes.status === "pending");
+// Up For Grabs chores can't change status until claimed (API 422), so skip them.
+const pending = chores.find((c) => c.attributes.status === "pending" && !c.attributes.up_for_grabs);
 if (!pending) {
-  console.log("No pending chores this week to test with. Skipped.");
+  console.log("No assigned, not-done chores this week to test with (Up For Grabs can't be). Skipped.");
 } else {
   const name = pending.attributes.summary;
   const go = await ask(`Test on "${name}" (${pending.attributes.start})? It gets set back after. [y/N] `);
