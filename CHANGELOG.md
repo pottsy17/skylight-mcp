@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **`get_calendar_events` now says who each event is for.** Every event gets a `Family members: Alex (ID: 123), Sam (ID: 456)` line, so an assistant can answer "who's going?" without guessing from titles. Events are requested with `include=categories`: without it the API returns only one `category` per event even when several profiles are attached. Events with no profile are flagged, since Skylight hides them. Reported in [rjhalvorson/skylight-mcp#12](https://github.com/rjhalvorson/skylight-mcp/issues/12) by @amitkoren, whose write-up documented the `include=categories` quirk.
 
+### Fixed
+
+- **Marking a chore done (or editing it) now actually changes it.** `update_chore` sent a JSON:API-wrapped PUT body that Skylight accepts with a 200 and ignores, so completions and edits silently did nothing. The body is now flat (like `create_chore`), the tool's `"completed"` maps to the API's `"complete"`, and a status change is sent separately from other edits (the API rejects both in one request with a 400). `get_chores` with `status: "completed"` now matches what the API returns. Found and verified live by @dperox ([rjhalvorson/skylight-mcp#11](https://github.com/rjhalvorson/skylight-mcp/pull/11)) and @bobbymarko ([#10](https://github.com/rjhalvorson/skylight-mcp/pull/10)); ported here with credit.
+
 ## [2.2.3] - 2026-08-22
 
 ### Fixed

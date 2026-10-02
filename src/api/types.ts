@@ -288,15 +288,6 @@ export interface UpdateCalendarEventRequest {
 
 export type CalendarEventResponse = JsonApiResponse<CalendarEventResource>;
 
-// Chore update request type
-export interface UpdateChoreRequest {
-  data: {
-    type: "chore";
-    attributes: Partial<ChoreAttributes>;
-    relationships?: ChoreRelationships;
-  };
-}
-
 // Reward request types
 export interface CreateRewardRequest {
   data: {

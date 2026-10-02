@@ -66,9 +66,11 @@ Unassigned "Up For Grabs" chores are included by default and labelled as such.`,
 
         let chores = result.chores;
 
-        // Filter by status
+        // Filter by status. The API stores completed chores as "complete"
+        // (not "completed"), so map the tool's enum value.
         if (status !== "all") {
-          chores = chores.filter((chore) => chore.attributes.status === status);
+          const apiStatus = status === "completed" ? "complete" : status;
+          chores = chores.filter((chore) => chore.attributes.status === apiStatus);
         }
 
         // Build category lookup for assignee names

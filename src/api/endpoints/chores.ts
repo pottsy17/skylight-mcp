@@ -4,7 +4,6 @@ import type {
   ChoreResponse,
   ChoreResource,
   CategoryResource,
-  UpdateChoreRequest,
 } from "../types.js";
 
 export interface GetChoresOptions {
@@ -123,38 +122,47 @@ export async function updateChore(
 ): Promise<ChoreResource> {
   const client = getClient();
 
-  const request: UpdateChoreRequest = {
-    data: {
-      type: "chore",
-      attributes: {},
-    },
-  };
+  // The Skylight PUT endpoint expects a FLAT request body (not JSON:API
+  // format). A wrapped { data: { type, attributes } } body is accepted with a
+  // 200 but silently applies nothing. (Found and verified live by @dperox in
+  // rjhalvorson/skylight-mcp#11 and @bobbymarko in #10.)
+  const body: Record<string, unknown> = {};
 
-  // Map options to attributes
-  if (options.summary !== undefined) request.data.attributes.summary = options.summary;
-  if (options.start !== undefined) request.data.attributes.start = options.start;
-  if (options.startTime !== undefined) request.data.attributes.start_time = options.startTime;
-  if (options.status !== undefined) request.data.attributes.status = options.status;
-  if (options.recurring !== undefined) request.data.attributes.recurring = options.recurring;
-  if (options.recurrenceSet !== undefined) request.data.attributes.recurrence_set = options.recurrenceSet;
-  if (options.rewardPoints !== undefined) request.data.attributes.reward_points = options.rewardPoints;
-  if (options.emojiIcon !== undefined) request.data.attributes.emoji_icon = options.emojiIcon;
+  if (options.summary !== undefined) body.summary = options.summary;
+  if (options.start !== undefined) body.start = options.start;
+  if (options.startTime !== undefined) body.start_time = options.startTime;
+  // The API's completed value is "complete", not "completed".
+  if (options.status !== undefined) {
+    body.status = options.status === "completed" ? "complete" : options.status;
+  }
+  if (options.recurring !== undefined) body.recurring = options.recurring;
+  if (options.recurrenceSet !== undefined) body.recurrence_set = options.recurrenceSet;
+  if (options.rewardPoints !== undefined) body.reward_points = options.rewardPoints;
+  if (options.emojiIcon !== undefined) body.emoji_icon = options.emojiIcon;
 
-  // Handle category relationship
+  // Reassignment: the flat body takes category_id / category_ids directly.
   if (options.categoryId !== undefined) {
-    if (options.categoryId === null) {
-      request.data.relationships = { category: { data: null } };
-    } else {
-      request.data.relationships = {
-        category: { data: { type: "category", id: options.categoryId } },
-      };
-    }
+    body.category_id = options.categoryId;
+    body.category_ids = options.categoryId === null ? [] : [options.categoryId];
   }
 
-  const response = await client.request<ChoreResponse>(
-    `/api/frames/{frameId}/chores/${choreId}`,
-    { method: "PUT", body: request }
-  );
+  const url = `/api/frames/{frameId}/chores/${choreId}`;
+
+  // The API rejects (400) a PUT that changes the completion status AND other
+  // attributes in the same request, so split into two sequential requests.
+  const { status, ...rest } = body;
+  let response: ChoreResponse | undefined;
+
+  if (Object.keys(rest).length > 0) {
+    response = await client.request<ChoreResponse>(url, { method: "PUT", body: rest });
+  }
+  if (status !== undefined) {
+    response = await client.request<ChoreResponse>(url, { method: "PUT", body: { status } });
+  }
+  // No fields provided: a no-op PUT still returns the current chore.
+  if (!response) {
+    response = await client.request<ChoreResponse>(url, { method: "PUT", body: {} });
+  }
 
   return response.data;
 }
