@@ -107,4 +107,4 @@ The release workflow (`.github/workflows/release.yml`) will:
 ## API Quirks
 
 - **Calendar date_max is exclusive**: When querying calendar events, `date_max` is treated as exclusive. The code adds 1 day to include events on the end date.
-- **Auth format**: Managed email/password auth now uses OAuth and bearer tokens. Manual token auth may still use bearer or basic depending on the captured token.
+- **Auth format**: Managed email/password auth uses OAuth and bearer tokens. Manual token auth uses bearer or basic depending on the captured token.
