@@ -56,7 +56,7 @@ Some features require a Skylight Plus subscription. The server detects subscript
 
 **Plus-only domains**: Rewards, Meals, Photos. Subscription status is inferred after login from live API access.
 
-## MCP Tools (41 total)
+## MCP Tools
 
 ### Base Tools (Always Available)
 
