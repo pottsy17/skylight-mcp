@@ -25,8 +25,8 @@ npm run generate:types # Generate TypeScript types from OpenAPI spec
 ## Architecture
 
 **Two-tier tool system**:
-1. `api/endpoints/*.ts` (11 modules) - Low-level HTTP wrappers for each API resource
-2. `tools/*.ts` (9 modules) - MCP tool definitions with Zod parameter validation
+1. `api/endpoints/*.ts` (one module per API resource) - Low-level HTTP wrappers
+2. `tools/*.ts` (one module per domain) - MCP tool definitions with Zod parameter validation
 
 **Tool Registration**: Each domain exports `registerXxxTools(server)` called from `server.ts`. Plus-only tools are conditionally registered based on subscription status.
 
