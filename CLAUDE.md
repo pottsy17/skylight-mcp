@@ -48,7 +48,7 @@ Two methods supported (validated via Zod refinement in `config.ts`):
 
 Both require `SKYLIGHT_FRAME_ID` (household identifier from API URLs like `/api/frames/{frameId}/chores`).
 
-**Note**: Email/password auth now resolves to a bearer token. Manual token auth still supports either `bearer` or `basic`.
+**Note**: Email/password auth resolves to a bearer token. Manual token auth supports either `bearer` or `basic`.
 
 ## Plus Subscription
 
